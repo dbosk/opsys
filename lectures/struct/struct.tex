@@ -1,0 +1,103 @@
+% $Id$
+% Author:	Daniel Bosk <daniel.bosk@miun.se>
+%\documentclass[handout]{beamer}
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[swedish,english]{babel}
+\usepackage{url}
+\usepackage{varioref,prettyref}
+\usepackage{graphicx}
+\usepackage[today,nofancy]{svninfo}
+\usepackage[natbib,style=alphabetic,maxbibnames=99,backend=bibtex8]{biblatex}
+\addbibresource{literature.bib}
+\usepackage[varioref,prettyref]{miunmisc}
+
+\svnInfo $Id$
+
+\mode<presentation>
+{
+  \usetheme{Frankfurt}
+  \setbeamercovered{transparent}
+  \usecolortheme{seagull}
+}
+%\def\newblock{\hskip .11em plus .33em minus .07em}
+\setbeamertemplate{footline}{\insertframenumber}
+
+\title{%
+  Operating System Structure
+}
+\author{Daniel Bosk\footnote{%
+	\tiny
+  This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 
+  Unported license.
+	To view a copy of this license, visit 
+	\url{http://creativecommons.org/licenses/by-sa/3.0/}.
+}}
+\institute[MIUN ICS]{%
+  Department of Information and Communication Systems (ICS),\\
+  Mid Sweden University, Sundsvall.
+}
+\date{\svnId}
+
+
+\AtBeginSection[]{%
+  \begin{frame}<beamer>{Overview}
+		\tableofcontents[currentsection]
+	\end{frame}
+}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Overview}
+	\tableofcontents
+	% You might wish to add the option [pausesections]
+\end{frame}
+
+
+% Since this a solution template for a generic talk, very little can
+% be said about how it should be structured. However, the talk length
+% of between 15min and 45min and the theme suggest that you stick to
+% the following rules:  
+
+% - Exactly two or three sections (other than the summary).
+% - At *most* three subsections per section.
+% - Talk about 30s to 2min per frame. So there should be between about
+%   15 and 30 frames, all told.
+
+
+\section{Kernel and Shell}
+
+\subsection{Kernel}
+
+\begin{frame}{\insertsubsectionhead}
+\end{frame}
+
+\subsection{System Calls}
+
+\begin{frame}{\insertsubsectionhead}
+\end{frame}
+
+\subsection{System Programs}
+
+\begin{frame}{\insertsubsectionhead}
+\end{frame}
+
+\subsection{Shell}
+
+\begin{frame}{\insertsubsectionhead}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[allowframebreaks]{Referenser}
+  \small
+  \printbibliography
+\end{frame}
+
+\end{document}
+

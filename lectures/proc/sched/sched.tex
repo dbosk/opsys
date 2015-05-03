@@ -1,0 +1,460 @@
+% $Id$
+% Author:	Daniel Bosk <daniel.bosk@miun.se>
+%\documentclass[handout]{beamer}
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[swedish,english]{babel}
+\usepackage{url}
+\usepackage{varioref,prettyref}
+\usepackage{graphicx}
+\usepackage[binary,squaren]{SIunits}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage[today,nofancy]{svninfo}
+\usepackage[natbib,style=alphabetic,maxbibnames=99,backend=bibtex8]{biblatex}
+\addbibresource{literature.bib}
+\usepackage[listings,varioref,prettyref]{miunmisc}
+
+\svnInfo $Id$
+
+\mode<presentation>
+{
+  \usetheme{Frankfurt}
+  \setbeamercovered{transparent}
+  \usecolortheme{seagull}
+}
+%\def\newblock{\hskip .11em plus .33em minus .07em}
+\setbeamertemplate{footline}{\insertframenumber}
+
+\title{%
+  Scheduling
+}
+\author{Daniel Bosk\footnote{%
+	\tiny
+  This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 
+  Unported license.
+	To view a copy of this license, visit 
+	\url{http://creativecommons.org/licenses/by-sa/3.0/}.
+}}
+\institute[MIUN ICS]{%
+  Department of Information and Communication Systems (ICS),\\
+  Mid Sweden University, Sundsvall.
+}
+\date{\svnId}
+
+
+\AtBeginSection[]{%
+  \begin{frame}<beamer>{Overview}
+		\tableofcontents[currentsection]
+	\end{frame}
+}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Overview}
+	\tableofcontents
+	% You might wish to add the option [pausesections]
+\end{frame}
+
+\begin{frame}{Literature}
+  \input{literature.tex}
+\end{frame}
+
+
+% Since this a solution template for a generic talk, very little can
+% be said about how it should be structured. However, the talk length
+% of between 15min and 45min and the theme suggest that you stick to
+% the following rules:  
+
+% - Exactly two or three sections (other than the summary).
+% - At *most* three subsections per section.
+% - Talk about 30s to 2min per frame. So there should be between about
+%   15 and 30 frames, all told.
+
+\section[Scheduling]{Process Scheduling}
+
+\subsection{CPU Scheduling}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item CPU-scheduling is at the heart of multiprogramming.
+
+    \item It concerns the short-term scheduler.
+
+    \item It is used to schedule which process is allowed to execute its 
+      instructions on the CPU at any given time.
+
+    \item If the operating system supports kernel threads it's kernel threads, 
+      not processes, being scheduled.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item The short-term scheduler selects which process to allocate the CPU to 
+      next.
+
+    \item The dispatcher is the function which performs
+      the context switch,
+      switching to user mode,
+      and restarting the process on the correct instruction.
+
+    \item It's important that these functions execute quickly, as they might be 
+      executed every 10 to 100 milliseconds.
+
+  \end{itemize}
+\end{frame}
+
+\subsection{CPU-I/O Burst Cycle}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Process execution can be divided into two classes.
+      \begin{enumerate}
+        \item CPU-bursts:
+          The process executes on the CPU, actually executing instructions, 
+          e.g.\ performing computations.
+
+        \item I/O-bursts:
+          The process spends its time reading from or writing to various 
+          devices, i.e.\ the process spends a lot of time waiting for the 
+          I/O-devices.
+
+      \end{enumerate}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{burstcycle.pdf}
+    \caption{An illustration of the CPU-I/O burst cycle for a process.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{burstdiag.pdf}
+    \caption{A diagram of a typical ratio between CPU and I/O bursts.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\subsection{Preemptive and Non-Preemptive Scheduling}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Scheduling can be divided into the two classes preemptive and 
+      non-preemptive scheduling.
+
+    \item Non-Preemptive or cooperative scheduling leaves it up to the 
+      processes to give up the processor, e.g.\ through blocking on I/O.
+
+    \item Preemptive does abort one process in favour of another process, e.g.\ 
+      every process may have 100 milliseconds each in turn.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Preemptive is most prominent.
+    \item Requires special hardware though, e.g.\ timers.
+    \item Synchronisation issuse also arises, e.g.\ race conditions.
+  \end{itemize}
+\end{frame}
+
+
+\section{Algorithms}
+
+\subsection{Scheduling Criteria}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{description}
+    \item[CPU utilisation] We can to keep the CPU as busy as we possibly can.
+
+    \item[Throughput] One measure of performance is how many processes complete 
+      per time unit.
+
+    \item[Turnaround time] Yet another measure is how long it takes from jobs 
+      submission to job completion.
+
+    \item[Waiting time] The scheduling algorithm doesn't affect the time it 
+      takes for a process to execute instructions or do I/O, it only affects 
+      the waiting time.
+
+    \item[Response time] In an interactive system the turnaround time or 
+      throughput might not be relevant measures.
+      Response time is more suitable as a process might be able to produce some 
+      output even before it's done.
+
+  \end{description}
+\end{frame}
+
+\subsection{First-Come, First-Served (FCFS)}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item A very basic schduling algorithm allocating the CPU to the processes 
+      in FIFO order.
+
+    \item The downside of this algorithm is that average waiting time is 
+      usually quite long.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{table}
+    \begin{tabular}{cc}
+      \textbf{Proc} & \textbf{Burst-time} \\
+      \toprule
+      \(P_0\)   & 24 \\
+      \(P_1\)   & 2 \\
+      \(P_2\)   & 4 \\
+      \bottomrule
+    \end{tabular}
+    \caption{An example of processes and their bust-time.}
+  \end{table}
+\end{frame}
+
+\subsection{Shortest Job First (SJF)}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item This algorithm uses the length of the processes' CPU-bursts to 
+      determine the order of execution.
+
+    \item The problem with this algorithm is that it's nearly impossible to 
+      implement, estimating the length of a CPU-burst is very hard to do 
+      accurately.
+
+    \item However, it's provably optimal, giving the minimum average waiting 
+      time.
+
+    \item One can do it by estimation, using the lengths of previous bursts to 
+      predict the length of the coming one.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{table}
+    \begin{tabular}{cc}
+      \textbf{Proc} & \textbf{Burst-time} \\
+      \toprule
+      \(P_0\)   & 6 \\
+      \(P_1\)   & 8 \\
+      \(P_2\)   & 7 \\
+      \(P_3\)   & 3 \\
+      \bottomrule
+    \end{tabular}
+    \caption{An example of processes and their burst-time.}
+  \end{table}
+\end{frame}
+
+\subsection{Priority Scheduling}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Priority scheduling is the general form of SJF, if using as priority 
+      for a process the inverse predicted length of CPU-burst.
+
+    \item Higher-priority processes are scheduled before lower-priority 
+      processes.
+
+    \item Processes having the same priority is scheduled using FCFS.
+
+    \item Major problem with all priority-based algorithms is indefinite 
+      blocking, or starvation.
+
+    \item One solution to this is some kind of aging, older processes increase 
+      in priority.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{table}
+    \begin{tabular}{ccc}
+      \textbf{Proc} & \textbf{Burst-time} & \textbf{Priority} \\
+      \toprule
+      \(P_0\)   & 10  & 3 \\
+      \(P_1\)   & 1   & 1 \\
+      \(P_2\)   & 2   & 4 \\
+      \bottomrule
+    \end{tabular}
+    \caption{An example of processes and their burst-time and priorities.}
+  \end{table}
+\end{frame}
+
+\subsection{Round Robin (RR)}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Uses time-quantum, each process is allocated this much time on the 
+      CPU, then it's preempted.
+
+    \item Average waiting-time is often long.
+
+    \item With a time-quantum \(q\) and \(n\) processes, each process executes 
+      \(\frac{1}{n} q\) and waits at most \( (n-1)\times q\) time units.
+
+    \item The performance depends on the size of the time-quantum.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{rr-quantum.pdf}
+    \caption{An illustration that smaller time-quantum increases the number of 
+      context swtiches.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{table}
+    \begin{tabular}{cc}
+      \textbf{Proc} & \textbf{Burst-time} \\
+      \toprule
+      \(P_0\)   & 24 \\
+      \(P_1\)   & 2 \\
+      \(P_2\)   & 4 \\
+      \bottomrule
+    \end{tabular}
+    \caption{An example of processes and their bust-time.}
+  \end{table}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+\end{frame}
+
+\subsection{Multilevel Queue}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item We have several ready queues.
+    \item Each queue has its own scheduling algorithms.
+    \item On top of that we have scheduling among queues.
+    \item Processes in lower-priority queues are preempted when a process 
+      enters in a higher-priority queue.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{multilevel.pdf}
+    \caption{An example of a multilevel queue structure.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\subsection{Multilevel Feedback Queue}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item An extension of previous algorithm in that a process may move between 
+      queues depending on its CPU-burst characteristic.
+
+    \item E.g.\ a process using too much CPU-time will be lowered, a process 
+      just doing I/O may be higher.
+
+    \item When the I/O-bound process becomes a CPU-bound process it will be 
+      lowered again.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{multilvl-feedback.pdf}
+    \caption{An example of a multilevel feedback queue system.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+
+\section[Multiprocessors]{Multiprocessor Scheduling}
+
+\subsection{Asymmetric Multiprocessor Scheduling}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item In this kind of setup we have one master server delegating work to 
+      the other processors.
+
+    \item I.e.\ one processor (the master) does I/O, scheduling, etc.\ whereas 
+      all others execute only user code.
+  \end{itemize}
+\end{frame}
+
+\subsection{Symmetric Multiprocessor Scheduling}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item This is the more common approach.
+    \item All processors are peers, executing everything.
+    \item I.e.\ all processors does I/O etc.
+    \item Every processor schedules its own execution; has perhaps an own ready 
+      queue, perhaps a joint one for all processors.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item One problem which arises with SMP is non-uniform memory access 
+      (NUMA), i.e.\ when different parts of memory is accessed with different 
+      speeds.
+
+    \item Another problem is if a process runs on one processor and is the 
+      scheduled on another processor, then the cache is invalid on the previous 
+      processor and it must be filled on the new one.
+
+    \item Hence it's bad to move processes between processors.
+
+    \item This is called processor affinity.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{numa.pdf}
+    \caption{An illustration of the problem with NUMA.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item We must have some type of load balancing, otherwise all processes 
+      might end up on one processor with all other processors idle.
+
+    \item We therefore have soft and hard affinity, to allow moves in some 
+      cases but not in others.
+
+    \item Load balancing in SMP can be done with either push or poll migration.
+
+    \item However, they are not mutually exclusive.
+
+  \end{itemize}
+\end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[allowframebreaks]{Referenser}
+  \small
+  \printbibliography
+\end{frame}
+
+\end{document}
+

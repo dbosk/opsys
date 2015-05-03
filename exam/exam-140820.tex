@@ -1,0 +1,362 @@
+% $Id$
+% Author:	Daniel Bosk <daniel.bosk@miun.se>
+\documentclass[addpoints,svv]{miunexam}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[swedish,english]{babel}
+\usepackage{hyperref,url}
+\usepackage{color}
+\usepackage{prettyref,varioref}
+\usepackage{subfigure}
+\usepackage{listings}
+\usepackage[binary]{SIunits}
+\usepackage[varioref,prettyref,listings]{miunmisc}
+\bibliographystyle{alpha}
+
+%\printanswers
+
+\examtype{Final exam}
+\courseid{DT011G}
+\course{Introduction to Operating Systems}
+\date{2014-08-20}
+
+\author{%
+	Daniel Bosk\\
+  {\small\texttt{\href{mailto:daniel.bosk@miun.se}{daniel.bosk@miun.se}}}\\
+  {\small\textit{Phone:} 060\,-\,14\,8709}\\
+}
+
+\begin{document}
+\maketitle
+\thispagestyle{foot}
+
+\section*{Instructions}
+\label{sec:Instructions}
+Carefully read the questions before you start answering them.
+Note the time limit of the exam and plan your answers accordingly.
+Only answer the question, do not write about subjects remotely related to the
+question.
+
+Write your answers on separate sheets, not on the exam paper.
+Only write on one side of the sheets.
+Start each question on a new sheet.
+
+Make sure you write your answers clearly, if I cannot read an answer the answer
+will be awarded no points -- even if the answer is correct.
+The questions are \emph{not} sorted by difficulty.
+
+Note that your answers for this exam does \emph{not} have to include references 
+to relevant literature.
+
+\begin{description}
+	\item[Time] 5 hours.
+  \item[Aids] Dictionary,
+    course literature 
+    \cite{Silberschatz2009osc,Silberschatz2013osc,Silberschatz2013intl},
+    graded assignments,
+    personal notes,
+    and a calculator.
+    The student may use the following e-book reader:
+    TrekStor eBook-reader 3.0.
+	\item[Maximum points] \numpoints
+	\item[Questions] \numquestions
+\end{description}
+
+%\subsection*{Bonus points}
+%\noindent
+%You must get an E or higher, to get the bonus points added to your final grade.
+%Bonus points will be added to this exam and the first re-exam.
+
+\subsection*{Preliminary grades}
+
+To pass this exam you need to have at least an average of one (1) point per 
+question, and no question may be awarded zero points.
+The averages for the grades can be summarised as follows:
+E \(\geq 1\),
+D \(\geq 1.5\),
+C \(\geq 2\),
+B \(\geq 2.5\),
+A \(\geq 3\),
+with no question awarded zero points.
+
+
+\section*{Aim}
+\label{sec:Aim}
+The aim of the exam is to examine that you have fulfilled the requirements 
+specified in the course syllabus.
+
+\clearpage
+\section*{An operating systems oriented computer science fiction,\\
+  or: The exam questions}
+
+\begin{questions}
+  \question[3]\label{q:apache}
+  A colleague at your work-place is setting up a web-server.
+  He is working with the Apache web-server.
+  The Apache web-server is modular by design, meaning it has loadable modules 
+  to get different behaviour on different systems.
+  For instance, it has one module which spawns a child process for each client 
+  to handle its requests.
+  Another of Apache's modules creates a thread for each client to handle its 
+  requests.
+
+  Your colleague asks you: ``What are the advantages and disadvantages of each 
+  approach?  Which one should I pick?''
+
+  \begin{solution}
+    Threads share memory of a single process \cite[p.  
+    153--154]{Silberschatz2009osc}, hence less memory is used to handle many 
+    clients.
+    This could be the difference between having to swap to disk or not.
+    It will definitely be faster to create a thread for each client than to 
+    fork an entire process \cite[p. 154]{Silberschatz2009osc} (although the 
+    forking in UNIX-like systems is heavily optimized for this).
+
+    The disadvantages include more complex programming (concurrent programming 
+    is thus more error prone) which increases the risk of buggy code, which of 
+    course can be exploited.
+    Another disadvantage is that if a client manages to crash its server, i.e.\ 
+    a thread, then the entire web-server goes down -- for all clients!
+    E.g.\ generating a memory error in one thread will make the operating 
+    system terminate the process, not just a single thread.
+
+    Furthermore, since memory is shared among threads, this means that the 
+    thread of one client can access the memory of a thread of another client.
+    Thus a client could access the web data of another client, containing e.g.\ 
+    credit-card data.
+    This is of course provided there exists a vulnerability which can be 
+    exploited, but as stated above: multi-threaded programs are more complex 
+    and hence more error prone.
+  \end{solution}
+
+
+  \question[3]\label{q:deadlock}
+  After work you are visiting a friend, this friend of yours is not very 
+  tech-savy (although he himself thinks that he is).
+  When you arrive he says to you: ``You know what, I managed to deadlock a ssh 
+  and tar pipe the other day.''
+  You look strangely at him as he continues, ``well, I ran \term{tar -zcf 
+  - <files> | ssh user@server tar -zxf -},'' a trick you taught him, ``and then 
+  I accidentaly disconnected my access point.  The program was deadlocked for 
+  several minutes before it finally quit.''
+
+  Explain to your friend what a deadlock really is and why this is not 
+  a deadlock.
+
+  \begin{solution}
+    The problem here is not that of a deadlock, it is a common misuse of 
+    terminology.
+    For a deadlock to occur you need the following four conditions to hold 
+    \cite[pp. 285--287]{Silberschatz2009osc}:
+    \begin{enumerate}
+      \item Mutual exclusion: at least one resource must be held by any process 
+        in an unsharable way, such that no other process can access the 
+        resource while being held by another process.
+      \item Hold and wait: a process must be holding at least one resource and 
+        must be waiting for at least one more which is held by another process.
+      \item No preemption: there can be no preemption, i.e. there cannot be any 
+        process which may interrupt and force another process to release any 
+        resource.
+        Hence we cannot deallocate a resource from one process to reallocate it 
+        to another.
+        Thus no kind of priority system may exist.
+      \item Circular wait: there must exist a set of processes \(\{P_1, \ldots, 
+        P_n\}\) such that \(P_1\) is waiting for \(P_2\), which is waiting for 
+        \(P_3\), and so on until \(P_n\) which is waiting for \(P_1\).
+    \end{enumerate}
+    If these four conditions hold we have a deadlock.
+
+    Then why is our scenario above not a deadlock?
+    First, there is no resource for which we have mutual exclusion.
+
+    Second, there is no process holding a resource and waiting for another held 
+    by a different process.
+    We have one process waiting for another process, the \term{tar(1)} process 
+    on the server waiting for data from that on the client, but not in a way 
+    required by our condition.
+
+    Third, as there is no resource for which we have mutual exclusion there is 
+    no sense in speaking of preemption for any such resource either.
+
+    Fourth, there is no circular wait involved.
+    Sure, as stated above the server process waits for data from the client 
+    process, but there is no resource which is being held which is waited for.
+
+    It is thus inappropriate use of terminology to call this a deadlock.
+    Using an analogy of Sten-Erik Winborg: if you consider the Dining 
+    Philosophers Problem, what happened in our scenario is equivalent of 
+    removing the bowl in the middle of the table from which the philosophers 
+    get their food.
+  \end{solution}
+
+
+  \question[3]\label{q:addrspace}
+  A little embaressed for his misunderstanding of what a deadlock is (remember, 
+  he considers himself as tech-savy) he quickly changes the conversation.
+  ``Oh, I have to tell you, I just upgraded my legacy 32-bit hardware for my 
+  in-closet server to a bit more modern 64-bit hardware.''
+  Whereby you reply: ``Nice, did you know something cool, the 64-bit address 
+  space is so large that hierarchical paging systems are in general too 
+  ineffective to use, one has to resolve to hashed or inverted page tables 
+  instead.''
+  Your friend looks at you in disbelief and says: ``And why is that?
+  How can it be effective for 32-bit systems but not for 64-bit systems?  That 
+  makes no sense.''
+
+  How do you answer him?
+  (A tip is to give a convincing example and calculating the effective access 
+  time for that particular example, there is no arguing against that as long as 
+  it is a valid example and your calculations are correct.)
+
+  \begin{solution}
+    First, let us assume that each memory access takes 
+    \unit{100}{\nano\second}.
+    Let us further assume that we use 32-bit physical addresses in a 32-bit 
+    system and 64-bit physical addresses in a 64-bit system.
+    Also assume a page size of \unit{4}{\kibi\byte}, i.e.\ \(2^{12}\) bytes.
+
+    For clarity we make no use of TLBs.
+
+    In a 32-bit system, we use hierarchical paging because otherwise the page 
+    table of each process would be too large:
+    we would need contigous memory to hold \(2^{32} / 2^{12} = 2^{20}\) 
+    entries, each of which being 32 bits, or 4 bytes.
+    That is, we would need \unit{4}{\mebi\byte} of contigous memory.
+    This would counter the benefits of using paged memory and is thus 
+    unacceptable.
+    When we introduce hierachical paging we want to fit page tables into single 
+    pages (and corresponding frames) \cite[p. 337]{Silberschatz2009osc}.
+    By dividing the 20 bits of page number into two 10-bit parts we can use the 
+    first part (most significant bits) as the outer page.
+    There are \(2^{10}\) entries which will fit nicely into a single page.
+    Each of these entries contain a page number, we use the inner page number 
+    as an offset into this page.
+    The address at this offset is another page, and this is the actual page 
+    which we are looking for.
+    Notice that we need to perform three memory references.
+    One for the outer page, one for the inner page, and then the final one to 
+    access the actual page.
+    With our assumptions this would mean that the effective access time will be 
+    \(\unit{100}{\nano\second} + \unit{100}{\nano\second} 
+    + \unit{100}{\nano\second} = \unit{300}{\nano\second}.\)
+    In the single-level paging scheme we first access the page table and then 
+    the page, yielding an effective access time of only 
+    \unit{200}{\nano\second}.
+
+    Looking at the 64-bit system we realise that we would need a six-level page 
+    table: \(2^{64} / 2^{12} = 2^{52}\) entries to store, i.e.\ 
+    \unit{4}{\tebi\byte} of memory is required to store the page table.
+    For this we need five 10-bit outer pages and one 2-bit outer page.
+    This would require a total of seven memory accesses and hence would yield 
+    an effective access time of \unit{700}{\nano\second} -- not as slow as 
+    a hard-disk drive, but we are closing in.
+    And alas, we must find another way to do this, we need a lower effective 
+    access time.
+  \end{solution}
+
+
+  \question
+  Back at work in the morning, you are trying to focus on your work.
+  However, one of your colleagues comes to you with Silberschatz in hand.
+
+  ``We add paging to primary memory to remove problems of (external) 
+  fragmentation,'' she says.
+  ``In the same manner we divide the secondary memory into blocks (and 
+  clusters).
+  Then why do we talk about fragmentation in file systems when it's not an 
+  issue in RAM?''
+
+  You're thinking to yourself, ``well, that's not true of all file systems, but 
+  fine, we're not on that level yet.''
+
+  \begin{parts}
+    \part[3] Explain what is meant by ``fragmentation'' when we talk about 
+    files in secondary memory.
+    \begin{solution}
+      What we mean by fragmentation is that data is fragmented.
+      We have two types of fragmentation, external and internal fragmentation.
+      External being an issue due to contiguous allocation, because then free 
+      space might be fragmented so that there is enough free space -- but it's 
+      not contiguous and thus cannot be used.
+
+      Internal fragmentation arises when we try to counter external 
+      fragmentation.
+      We counter external fragmentation by dividing the space into blocks of 
+      a fixed size.
+      This way, whenever we need some space we allocate a sufficient amount of 
+      blocks.
+      In some cases we need less space than a full block, hence some space (the 
+      leftovers inside the block) is wasted.
+      But this way we can use all unallocated blocks as long as there are 
+      enough blocks free to cover our need.
+
+      This solution is applied both to primary and secondary storage.
+      In primary memory we have paging to map a contiguous logical memory to 
+      a non-contiguous physical memory.
+      For secondary storage, this means a contiguous file (logical space) is 
+      not stored contiguously in the storage medium (physical space).
+      Hence, what we mean by ``fragmentation'' in this case is that the blocks 
+      of the file are not stored contiguously but spread across the disk.
+    \end{solution}
+
+    \part[3] Explain why this can be an issue in secondary memory but not in 
+    primary despite us using the same methods in both places.
+    \begin{solution}
+      The reason this ``fragmentation'' is an issue in secondary storage and 
+      not in primary storage is due to the type of storage medium.
+      In primary storage, physical memory, we can access all parts of the 
+      physical memory module equally fast.
+      In secondary storage, a magnetic disk, we cannot do this.
+      This is due to the fact that a magnetic disk rotates and has a reading 
+      arm which has to be moved into position and then wait for the disk to 
+      rotate to the correct position.
+      Thus, the time it takes to read from this disk depends on how we read the 
+      data.
+      If the blocks of a file are stored in consecutive order on the disk we 
+      can read them all together, if not, then we have to move the read head 
+      and wait for rotation.
+
+      As such, this is no longer an issue in secondary storage with solid state 
+      disks, this is because these work more like the physical memory modules 
+      of primary storage.
+    \end{solution}
+  \end{parts}
+
+
+  \question[3]
+  You are finally approaching the end of your day.
+  Thinking back on a day full of interruptions, you start thinking ``oh, how 
+  I wish I could just turn off preemption sometimes.''
+  That reminds you that OSes sometimes turns off interrupts in kernel mode to 
+  avoid race conditions, ``why couldn't Mother Nature make the world more like 
+  an x86-architecture?''
+
+  That the kernel must protect its data structures by locks in a multiprocessor 
+  environment is obvious, but why must the kernel do that in a single processor 
+  environment too?
+  \begin{solution}
+    The problem we address in this question is about locks in the kernel -- not 
+    processes.
+    The kernel is one running program, in this case running only on a single 
+    processor (single core).
+    The reason we need to use locking mechanisms to protect sensitive kernel 
+    data structures is due to interrupts.
+    Although the kernel executes only in one thread it can be interrupted at 
+    any time, and the interrupt handler also executes as kernel code.
+    This way the kernel might execute in two critical sections simultaneously.
+
+    One solution is to introduce locks, another is to turn off interrupts in 
+    the entry section of a critical section and then turn it on again in the 
+    exit section.
+  \end{solution}
+
+\end{questions}
+
+Finally you are done, go through your answers thoroughly again(!) and then go 
+for a treat after all this hard work.
+\begin{center}
+  \textbf{The end.}
+\end{center}
+
+\bibliography{literature}
+\end{document}

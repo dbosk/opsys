@@ -1,0 +1,325 @@
+% $Id$
+% Author:	Daniel Bosk <daniel.bosk@miun.se>
+%\documentclass[handout]{beamer}
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[swedish,english]{babel}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{listings}
+\usepackage[today,nofancy]{svninfo}
+\usepackage[natbib,style=alphabetic,maxbibnames=99,backend=bibtex8]{biblatex}
+\addbibresource{literature.bib}
+\usepackage[listings]{miunmisc}
+
+\svnInfo $Id$
+
+\mode<presentation>
+{
+  \usetheme{Frankfurt}
+  \setbeamercovered{transparent}
+  \usecolortheme{seagull}
+}
+%\def\newblock{\hskip .11em plus .33em minus .07em}
+\setbeamertemplate{footline}{\insertframenumber}
+
+\title{%
+  Threads
+}
+\author{Daniel Bosk\footnote{%
+	\tiny
+  This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 
+  Unported license.
+	To view a copy of this license, visit 
+	\url{http://creativecommons.org/licenses/by-sa/3.0/}.
+}}
+\institute[MIUN ICS]{%
+  Department of Information and Communication Systems (ICS),\\
+  Mid Sweden University, Sundsvall.
+}
+\date{\svnId}
+
+
+\AtBeginSection[]{%
+  \begin{frame}<beamer>{Overview}
+		\tableofcontents[currentsection]
+	\end{frame}
+}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Overview}
+	\tableofcontents
+	% You might wish to add the option [pausesections]
+\end{frame}
+
+\begin{frame}{Literature}
+  \input{literature.tex}
+\end{frame}
+
+
+% Since this a solution template for a generic talk, very little can
+% be said about how it should be structured. However, the talk length
+% of between 15min and 45min and the theme suggest that you stick to
+% the following rules:  
+
+% - Exactly two or three sections (other than the summary).
+% - At *most* three subsections per section.
+% - Talk about 30s to 2min per frame. So there should be between about
+%   15 and 30 frames, all told.
+
+
+\section{Threads}
+
+\subsection{What is a thread?}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item The process is what we consider the smallest entity of execution.
+    \item This contains the program code, the variables (data), etc.
+    \item A process has traditionally only one \emph{thread} of execution, 
+      called a heavy-weight process.
+    \item Now, however, we'll extend this with more threads of execution.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{threads.pdf}
+    \caption{Single-threaded vs.\ multi-threaded process.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Multiple threads of execution means we can do many things 
+      simultaneously.
+
+    \item Have to be careful though, you never know who is changing something 
+      in the program at a given time.
+
+  \end{itemize}
+\end{frame}
+
+\subsection{Benefits}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Responsiveness
+    \item Resource sharing
+    \item Economy (context switching, process creation)
+    \item Scalabiblity
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}{Scalability}
+  \begin{figure}
+    \includegraphics[width=0.45\textwidth]{single-core.pdf}
+    \hfill
+    \includegraphics[width=0.45\textwidth]{multi-core.pdf}
+    \caption{A single-core and multi-core execution of two threads.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\subsection{Issues}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item What happens with fork(2) and exec(2)?
+      The calling thread only, or all threads?
+
+    \item exec(2) usually replaces all threads.
+
+    \item fork(2) can be different; in some cases only the calling thread is 
+      reasonable to fork, in other cases all of them.
+
+    \item Programming becomes more complex, introducing many potential bugs.
+
+  \end{itemize}
+\end{frame}
+
+\section[Implementation]{Implementation of threads}
+
+\subsection{Types of threads}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{description}
+    \item[User thread] This is what we imagine from the image above.
+      This executes in user-mode, and is invisible to the kernel.
+
+    \item[Kernel thread] These are threads part of the kernel.
+      These does not necessarily execute all code in kernel-mode though.
+  \end{description}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item User-threads are mapped to kernel-threads.
+    \item This mapping can be done in several ways:
+      \begin{itemize}
+        \item One-to-one,
+        \item Many-to-one,
+        \item Many-to-many.
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\subsection{The different models}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{one-to-one.pdf}
+    \caption{The one-to-one model.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Good in that it's the OS handling all scheduling.
+    \item Bad in that it requires as many kernel-threads as user-threads.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{many-to-one.pdf}
+    \caption{The many-to-one model.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Bad in that if one thread blocks, the whole process blocks, and thus 
+      all threads block.
+
+    \item Can be combined with the one-to-one model though, then threads can be 
+      partitioned.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{many-to-many.pdf}
+    \caption{The many-to-many model.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item The many-to-many model requires a light-weight process (LWP).
+
+    \item To the process this appears as a processor on which it can schedule 
+      its threads.
+
+    \item I.e.\ the thread library does the scheduling of its threads, as is 
+      the case in many-to-one also.
+
+    \item The kernel schedules all threads in the one-to-one model.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{lwp.pdf}
+    \caption{Structure including an LWP.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item The many-to-many model has the advantage that it has none of the 
+      problems of the other models.
+
+    \item It can have an arbitrarily large amount of threads.
+
+    \item If one thread blocks, i.e.\ one LWP is blocked, just schedule another 
+      LWP.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{two-level.pdf}
+    \caption{The two-level model.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\section{Signals}
+
+\subsection{What are signals?}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item A signal is lika an interrupt for a process.
+
+    \item The OS sends the process a signal.
+
+    \item The process must interrupt its current work to handle the signal, 
+      then it may return to previous work.
+
+    \item Examples include ``Division by zero'', ``Illegal memory access'' and 
+      hitting Ctrl+C keyboard combination.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{enumerate}
+    \item Program executes division by zero.
+    \item CPU generates interrupt, calls OS interrupt handler.
+    \item OS interrupt handler notes the process currently using the CPU.
+    \item OS generates as signal to the process.
+    \item Process's signal handler executes.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item With a multithreaded process, which thread should handle a signal 
+      from the OS?
+
+    \item This can usually be specified by the programmer.
+
+  \end{itemize}
+\end{frame}
+
+
+\section{Playing with Threads in Python}
+
+\subsection{With race-condition}
+
+\begin{frame}[fragile,allowframebreaks]{\insertsubsectionhead}
+  \lstinputlisting[style=code,language=Python]{race.py}
+\end{frame}
+
+\subsection{Without race-condition}
+
+\begin{frame}[fragile,allowframebreaks]{\insertsubsectionhead}
+  \lstinputlisting[style=code,language=Python]{norace.py}
+\end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[allowframebreaks]{Referenser}
+  \small
+  \printbibliography
+\end{frame}
+
+\end{document}
+

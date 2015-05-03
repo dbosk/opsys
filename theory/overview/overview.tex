@@ -1,0 +1,218 @@
+% $Id$
+% Author: Daniel Bosk <daniel.bosk@miun.se>
+\documentclass[a4paper,nocourse]{miunasgn}
+\usepackage[utf8]{inputenc}
+\usepackage[swedish,english]{babel}
+\usepackage{url,hyperref}
+\usepackage{prettyref,varioref}
+\usepackage{natbib}
+\usepackage[nofancy,today]{svninfo}
+\usepackage[natbib,varioref,prettyref]{miunmisc}
+
+\svnInfo $Id$
+
+%\printanswers
+
+\courseid{DT141G}
+\course{Operating Systems}
+\assignmenttype{Theory assignment}
+\title{Overview}
+\author{Daniel Bosk\footnote{%
+	This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 
+	Unported license.
+	To view a copy of this license, visit 
+	\url{http://creativecommons.org/licenses/by-sa/3.0/}.
+	Some of the questions are derived from the work of 
+	\citeauthor*{Silberschatz2009osc}.
+}}
+\date{\svnId}
+
+\begin{document}
+\maketitle
+\thispagestyle{foot}
+\tableofcontents
+
+
+\section{Aim}
+\label{sec:Aim}
+The aim of the assignment is, first, to aid your understanding of the treated 
+content by providing questions and problems which inspire reflection.
+Second, it is to examinate the following:
+\begin{itemize}
+	\input{aims.tex}
+\end{itemize}
+
+
+\section{Prerequisites}
+\label{sec:Prerequisites}
+\input{literature.tex}
+
+
+\section{Tasks}
+\label{sec:Work}
+\begin{questions}
+	\question\label{q:ostypes}
+	Define the following operating system types:
+	\begin{parts}
+		\part batch,
+		\part interactive,
+		\part time-sharing,
+		\part realtime, and
+		\part distributed.
+	\end{parts}
+	\begin{solution}
+		\begin{description}
+			\item[Batch] Jobs are executed in bulk, e.g. batch(1) jobs on modern 
+				UNIX-like systems.
+				As the jobs are executed in bulk and then the results are returned to 
+				the user these systems do not wait for user input, all input to the job 
+				must be supplied from the beginning.
+
+				Performance can be increased by grouping together jobs which will keep 
+				both CPU and I/O devices busy.
+				This can be accomplished by e.g. buffering and multiprogramming.
+
+			\item[Interactive] This type of system executes in short bursts, commonly 
+				in the magnitude of seconds, and then the user provides input for the 
+				next burst of execution.
+				The results of these bursts are usually hard to predict as they depend 
+				on user input.
+				
+			\item[Time-sharing] This system executes a job for a very short period of 
+				time and then switches to another.
+				It iterates through all jobs, and does this so quickly the user 
+				conceives it as all processes running simultaenously.
+
+			\item[Realtime] A realtime operating system operates under timely 
+				restrictions.
+				All jobs must be executed within a given timeframe, if not they fail 
+				and other routines must be run to make up for the error -- if possible.
+				Examples include systems handling traffic lights or some kind of 
+				machinery.
+
+			% XXX look over answer for distributed systems
+			\item[Distributed] A distributed operating system has its functionality 
+				and parts distributed over several systems.
+				
+		\end{description}
+	\end{solution}
+	
+	\question\label{q:multiprogramming}
+	Describe the advantages of multiprogramming.
+	\begin{solution}
+		The advantage of multiprogramming is that when one process is idly waiting 
+		for some operation to complete, e.g. I/O, then the operating system can 
+		switch to another process for use of the CPU.
+		When the operation the first process was waiting for has completed the 
+		operating system can switch back and continue its execution.
+		This way the use of the resources of the system is maximized.
+
+		Some disadvantages (which are not asked for in this question), however, 
+		include that the system has to handle more than one process simultanously.  
+		This implies more memory is needed to have all processes in memory, if not, 
+		it requires swapping to swap them to a swapping device.
+	\end{solution}
+
+	\question\label{q:privinstr}
+	Describe why or why not the following instructions should be either 
+	privileged or not privileged:
+	\begin{parts}
+		\part setting a timer,
+		\part reading the time from the system clock,
+		\part freeing (or erasing) memory,
+		\part turning off interrupt handling,
+		\part switching between user and kernel mode.
+	\end{parts}
+	\begin{solution}
+		Setting a timer should be a privileged instruction as the system uses 
+		timers together with interrupts to handle preemptive scheduling.
+		Hence turning interrupt handling off should also be a privileged 
+		instruction.
+		
+		Reading the system clock does not have to be privileged as it is 
+		a read-only instruction and contains no secret information.
+
+		Freeing or erasing memory should be a privileged instruction as not to 
+		allow a process to free the memory of another process.
+		On the other hand, a process should be allowed to free its own memory by 
+		a call to the operating system, and this call should of course not be 
+		privileged.
+
+		Switching between user and kernel mode must be a privileged instruction.
+		Otherwise, to execute a privileged instruction a process only needs to 
+		switch to kernel mode and then execute it (and then switch back to user 
+		mode).
+	\end{solution}
+
+	\question\label{q:interrupts}
+	Define the terms
+	\begin{parts}
+		\part trap, and
+		\part interrupt.
+	\end{parts}
+	(What is the difference between them?)
+	\begin{solution}
+		An interrupt is a hardware signal to the processor which makes it interrupt 
+		what it is currently doing and execute one of its interrupt handling 
+		routines, depending on which interrupt occured.
+
+		Similarly a trap is also an interrupt, but it is generated by a software 
+		error rather than hardware.
+
+		An interrupt can be generated by a harddrive signalling it is done with 
+		I/O, whereas the trap can be generated by a division by zero.
+	\end{solution}
+
+	\question\label{q:kernelshell}
+	Define the terms
+	\begin{parts}
+		\part kernel, and
+		\part shell.
+	\end{parts}
+	\begin{solution}
+		The kernel is the main part of an operating system.
+		This is usually where e.g. functionality for handling memory and file 
+		systems reside.
+		It is the kernel which manages processes and their memory.
+
+		The shell is what separates the user from the kernel, the shell is 
+		a program which the user can interact with to make the operating system 
+		(i.e.\ kernel) do what is wishes, e.g. starting an editor process and then 
+		the editor process uses system calls to the kernel to open files.
+	\end{solution}
+
+	\question\label{q:kernelshellcntd}
+	Describe the relationship of the kernel and shell in
+	\begin{parts}
+		\part a UNIX-like operating system (not including MacOS), and
+		\part the Microsoft Windows operating system.
+	\end{parts}
+	\begin{solution}
+		The kernel and shell in a traditional UNIX-like operating system are 
+		visibly separated and a specific shell can be used for each user.
+		This means that the shell can exchanged for another.
+		Examples of traditional UNIX shells are the Bourne shell and Korn shell.
+		The shell in a UNIX-like operating system can also be graphical, i.e.\ using 
+		the X Window System.
+
+		In the Microsoft Windows operating system there is one shell which is 
+		tightly integrated with the operating system and thus cannot easily be 
+		exchanged for another.
+	\end{solution}
+
+	\question\label{q:os}
+	Describe the role of an operating system in a computer system, including its 
+	relationship to the other parts of the system.
+	\begin{solution}
+		Something like it being in between the user and the hardware \dots
+	\end{solution}
+
+\end{questions}
+
+
+%%% EXAMINATION %%%
+\input{examination.tex}
+
+
+\bibliography{literature}
+\end{document}

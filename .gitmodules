@@ -1,0 +1,16 @@
+[submodule "makefiles"]
+	path = makefiles
+	url = https://github.com/dbosk/makefiles.git
+	branch = master
+[submodule "miuntex"]
+	path = miuntex
+	url = https://github.com/dbosk/miuntex.git
+	branch = master
+[submodule "labs/paging/cpager"]
+	path = labs/paging/cpager
+	url = https://github.com/dbosk/cpager.git
+	branch = master
+[submodule "labs/paging/pypager"]
+	path = labs/paging/pypager
+	url = https://github.com/dbosk/pypager.git
+	branch = master

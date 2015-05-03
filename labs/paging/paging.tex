@@ -1,0 +1,284 @@
+% $Id$
+% Author:	Daniel Bosk <daniel.bosk@miun.se>
+% Date:		5 Dec 2012
+\documentclass[a4paper,nocourse]{miunasgn}
+\usepackage[utf8]{inputenc}
+\usepackage[swedish,english]{babel}
+\usepackage[hyphens]{url}
+\usepackage{hyperref}
+\usepackage{prettyref,varioref}
+\usepackage{color}
+\usepackage{listings}
+\usepackage{pdfpages}
+\usepackage[nofancy,today]{svninfo}
+\usepackage[natbib,style=numeric-comp,maxbibnames=99,sorting=none,backend=bibtex8]{biblatex}
+\addbibresource{literature.bib}
+\usepackage[varioref,prettyref,listings]{miunmisc}
+
+\svnInfo $Id$
+
+%\printanswers
+
+\courseid{DT141G}
+\course{Operating Systems}
+\assignmenttype{Laboratory assignment}
+\title{Paging Algorithms}
+\author{Daniel Bosk\footnote{%
+	This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 
+	Unported license.
+	To view a copy of this license, visit 
+	\url{http://creativecommons.org/licenses/by-sa/3.0/}.
+}}
+\date{\svnId}
+
+\begin{document}
+\maketitle
+\thispagestyle{foot}
+\tableofcontents
+
+
+\section{Introduction}
+\label{sec:Intro}
+The paging algorithm employed in a system can have a huge impact on the 
+performance of the system.
+In this laboratory assignment you are to examine a some of the simplest page 
+replacement algorithms using a simulator.
+
+
+\section{Aim}
+\label{sec:Aim}
+The aim of this laboratory assignment is to further your understanding of the 
+paging algorithms in question and the problems which have to be solved by this 
+kind of algorithm.
+It will also serve to examinate the following.
+\begin{itemize}
+		\input{aims.tex}
+\end{itemize}
+
+
+\section{Reading Instructions}
+\label{sec:Reading}
+\input{literature.tex}
+
+
+\section{Theory}
+\label{sec:Theory}
+The source code for the simulator is included with this assignment.
+The simulator program-file is called \term{pager}, for the C version located in 
+\term{cpager/}, or \term{pypager} for the Python version located in 
+\term{pypager/}.
+
+\subsection{The Simulator Written in C}
+
+To use the C version you will have to compile it.
+A \term{Makefile} is provided to make the process of compilation easier.
+To compile the program, simply execute the command-line \term{make pager} in 
+your terminal when your current working directory is \term{cpager/}.
+When run, the simulator program reads a page reference string from standard 
+input (stdin) and outputs its actions to standard output (stdout).
+
+To switch between algorithms you should first make changes in one of the source 
+files and then recompile the program.
+To switch to a different algorithm, edit the file \term{pager.c} and change the 
+argument to the function \code{mem_setalg}.
+The algorithms that are supported by the simulator program can be found in the 
+file \term{memalg.h}.
+When done, recompile the program by running \term{make pager} in the terminal 
+again.
+
+You can also change the number of available pages and frames.
+This is accomplished by changing the variables \code{npages} and \code{nframes} 
+also in \term{pager.c}.
+
+Running the paging simulator is rather straight-forward.
+Simply execute it without arguments and it will wait for the page reference 
+string on stdin.
+The page reference string can be space or new-line separated (or both) and the 
+output will be on the form of one action per line.
+The page references can optionally be prefixed with either an \emph{r} or 
+a \emph{w}; indicating that the frame should be read from or written to, 
+respectively.
+If no prefix is supplied, a read operation is assumed.
+This means that you could use the reference strings from 
+\cite{Silberschatz2009osc,Silberschatz2013osc,Silberschatz2013intl} directly, 
+and these would be interpreted as reading operations.
+
+To illustrate all this, the example in \prettyref{lst:reflength} illustrates 
+how to easily count the number of page references in our reference string.
+We see that we have 8 page references in our reference string.
+
+\begin{terminal}[float,label={lst:reflength},caption={An example from the 
+  UNIX-like terminal of how to compute the length of the reference string.}]
+$ make pager
+[lots of output]
+$ cat ../fifo-refstr.txt
+r1 w2 r3 r4
+w5 w6 r2 r10
+$ cat ../fifo-refstr.txt | wc -w
+8
+$
+\end{terminal}
+
+Listing \ref{lst:pager} illustrates the output of the simulator and how to 
+easily count the number of page faults.
+Of the 8 page references a total of 6 generated page faults.
+
+\begin{terminal}[float,label={lst:pager},caption={An example showing a run of 
+    the simulator.
+    The last page reference is out of range and causes an abort trap to the 
+    operating system, resulting in a killed process.
+  }]
+$ cat ../fifo-refstr.txt | ./pager
+page 1 generated page fault
+allocated free frame 0 to page 1
+swapped in page 1
+page 1 mapped to frame 0
+page 2 generated page fault
+allocated free frame 1 to page 2
+swapped in page 2
+page 2 mapped to frame 1
+page 3 generated page fault
+allocated free frame 2 to page 3
+swapped in page 3
+page 3 mapped to frame 2
+page 4 generated page fault
+allocated free frame 3 to page 4
+swapped in page 4
+page 4 mapped to frame 3
+page 5 generated page fault
+allocated free frame 4 to page 5
+swapped in page 5
+page 5 mapped to frame 4
+page 6 generated page fault
+swapped out page 1
+swapped in page 6
+page 6 mapped to frame 0
+page 2 mapped to frame 1
+page 10 generated abort trap: process killed
+$ cat ../fifo-refstr.txt | ./pager | grep "page fault" | wc -l
+6
+\end{terminal}
+
+\subsection{The Simulator Written in Python}
+
+The simulator written in Python, named \term{pypager}, works in exactly the 
+same manner as the one in C, the only difference is the programming language.
+Since it is written in Python you do not have to compile it though.
+Just go to the \term{pypager/} directory and run \term{./pypager} instead of 
+\term{./pager} as in the instruction for the C version of the simulator.
+
+To change the algorithms and number of frames or pages, edit the file 
+\term{pager.py}.
+Changing the algorithm used is done by changing the value of the variable 
+\code{alg}.
+There are lines prepared for this, just swtich to any of the other commented 
+out lines in the code.
+To change the pages or frames, modify the values of the variables \code{npages} 
+or \code{nframes}, respectively.
+
+
+\section{Work}
+\label{sec:Work}
+You should start by convincing yourself whether the provided replacement 
+algorithms are correctly implemented.
+Do this by testing different page reference strings and do the corresponding 
+computations manually using the descriptions of the algorithms given by 
+\citet[ch.\ 9.4]{Silberschatz2009osc,Silberschatz2013osc,Silberschatz2013intl}.
+
+Next, you should find one page reference string for each algorithm which yields 
+a minimum page-fault rate for that particular algorithm.
+The trivial page reference string containing only one repeated page number is 
+not allowed, all available pages must be referenced at least once.
+Similarily you should find a page reference string which yields a maximum 
+page-fault rate.
+
+You may post your findings to the forum in the course platform if you avoid 
+spoilers.
+That is, you may post the \emph{length} of the page reference string and the 
+number of page faults it generated -- but you may not post the string itself.
+
+Finally, find proof of Belady's anomaly for the algorithms suffering from it.
+%And, of course, correspondingly verify that this does not happen for the 
+%algorithms not suffering from it.
+
+The algorithms available are FIFO, Second-Chance, and Enhanced Second-Chance.
+
+
+\section{Examination}
+\label{sec:Examination}
+Hand in a written report (in PDF format) describing your results, the 
+conclusions you have drawn from these as well as why you drew these 
+conclusions.
+In essence, you should do the following:
+\begin{questions}
+	\question Answer whether the algorithms are correctly implemented or not?
+	\begin{solution}
+    ``Yes, after some extensive testing, I conclude that they are.''
+		The students must provide convincing test scenarios.
+	\end{solution}
+
+	\question Provide a page reference string which generates a minimum 
+	page-fault rate for each algorithm.
+	\begin{solution}
+    E.g.\ \code{0 1 2 3 4 5 6 7 8 9 9 9 9 9 9 ...} in the default 
+    configuration.
+    I.e.\ they get at most ten page faults (the initial page faults).
+    They must also explain this, just a string of numbers is not sufficient to 
+    pass.
+
+    It is accomplished similarly for the other algorithms.
+  \end{solution}
+
+	\question Provide a page reference string which generates a maximum 
+	page-fault rate for each algorithm.
+	\begin{solution}
+    E.g.\ \code{0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 ...} in the default 
+    configuration.
+    I.e.\ every page reference generates a page fault.
+    They must also explain this, just a string of numbers is not sufficient to 
+    pass.
+
+    It is accomplished similarly for the other algorithms.
+	\end{solution}
+
+	\question Provide evidence of Belady's anomaly for the algorithms suffering 
+	from it.
+	\begin{solution}
+    Using the page reference string \code{1 2 3 4 1 2 5 1 2 3 4 5}, with FIFO 
+    configured with three frames (the number of pages does not matter), we get 
+    nine page faults.
+		Increasing the number of frames to four, which should decrease the number 
+		of page faults as we have more frames, actually increases the number of 
+		page faults to ten.
+		This is proof of Belady's anomaly.
+
+    It is accomplished similarly for the other algorithms.
+	\end{solution}
+\end{questions}
+You should, as always, provide convincing arguments for your answers and use 
+correct references where applicable.
+
+To make life easy for you a report template is attached, see \emph{report.tex}.
+(This file is also included in \prettyref{app:report}.)
+You may produce your report using any tool, but it should look the same as the 
+one generated by the template.
+If you use it you can simply execute \term{make report.pdf} in the terminal to 
+compile the PDF-file.
+
+
+\printbibliography
+
+
+\appendix
+\section{A Report Template}
+\label{app:report}
+Here follows the inclusion of a LaTeX report template.
+This file is also included in the sources as \term{report.tex}.
+
+\lstinputlisting[style=code,language=tex]{report.tex}
+
+Here follows a compiled version of the above code.
+
+\includepdf[pages=-]{report.pdf}
+
+\end{document}

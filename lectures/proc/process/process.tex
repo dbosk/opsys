@@ -1,0 +1,393 @@
+% $Id$
+% Author:	Daniel Bosk <daniel.bosk@miun.se>
+%\documentclass[handout]{beamer}
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[swedish,english]{babel}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage[today,nofancy]{svninfo}
+\usepackage[natbib,style=alphabetic,maxbibnames=99,backend=bibtex8]{biblatex}
+\addbibresource{literature.bib}
+\usepackage[listings]{miunmisc}
+
+\svnInfo $Id$
+
+\mode<presentation>
+{
+  \usetheme{Frankfurt}
+  \setbeamercovered{transparent}
+  \usecolortheme{seagull}
+}
+%\def\newblock{\hskip .11em plus .33em minus .07em}
+\setbeamertemplate{footline}{\insertframenumber}
+
+\title{%
+  Processes
+}
+\author{Daniel Bosk\footnote{%
+	\tiny
+  This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 
+  Unported license.
+	To view a copy of this license, visit 
+	\url{http://creativecommons.org/licenses/by-sa/3.0/}.
+}}
+\institute[MIUN ICS]{%
+  Department of Information and Communication Systems (ICS),\\
+  Mid Sweden University, Sundsvall.
+}
+\date{\svnId}
+
+
+\AtBeginSection[]{%
+  \begin{frame}<beamer>{Overview}
+		\tableofcontents[currentsection]
+	\end{frame}
+}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Overview}
+	\tableofcontents
+	% You might wish to add the option [pausesections]
+\end{frame}
+
+\begin{frame}{Literature}
+  \input{literature.tex}
+\end{frame}
+
+
+% Since this a solution template for a generic talk, very little can
+% be said about how it should be structured. However, the talk length
+% of between 15min and 45min and the theme suggest that you stick to
+% the following rules:  
+
+% - Exactly two or three sections (other than the summary).
+% - At *most* three subsections per section.
+% - Talk about 30s to 2min per frame. So there should be between about
+%   15 and 30 frames, all told.
+
+
+\section[Concept]{Process Concept}
+
+\subsection{What is a process?}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Process is the general term for CPU-activity.
+    \item The basic executing entity in an operating system (OS).
+    \item Process is a program in execution.
+    \item Program is not a process:
+      \begin{itemize}
+        \item Run the same program several times will spawn many unique 
+          processes.
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{proc.pdf}
+    \caption{An schematic of an in-memory process.
+      Image: \cite[Fig.\ 3.1, p.\ 102]{Silberschatz2009osc}.}
+  \end{figure}
+\end{frame}
+
+\subsection{In the OS}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Must share resources fairly among all processes.
+    \item OS has to keep track of all processes.
+    \item OS uses a structure called Process Control Block (PCB) for this.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}{PCB}
+  \begin{itemize}
+    \item Process state
+    \item Program counter
+    \item CPU-registers
+    \item Scheduling information
+    \item Memory-information
+    \item Accounting information
+    \item I/O-information
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{description}
+    \item[State] What state the process is currently in:
+      \begin{itemize}
+        \item New,
+        \item Running,
+        \item Waiting,
+        \item Ready, and
+        \item Terminated.
+      \end{itemize}
+  \end{description}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{states.pdf}
+    \caption{State-transition diagram.
+      Image: \cite[p.\ 103]{Silberschatz2009osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{pcb.pdf}
+    \caption{The PCB.
+      Image: \cite{Silberschatz2009osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{description}
+    \item[Program counter] Where in the program code the process is currently 
+      executing.
+
+    \item[CPU-registers] A copy of the values in all CPU-registers, as the 
+      CPU-registers are used by the currently executing process.
+
+    \item[Scheduling info] Priorities, scheduling queues.
+
+    \item[Memory-info] Base and limit registers, page tables.
+
+    \item[Accounting] How much CPU-time spent, how much I/O-time spent, time 
+      left of time-slice, process ID.
+
+    \item[I/O-info] Allocated I/O-devices, open files.
+  \end{description}
+\end{frame}
+
+\section[Scheduling]{Process Scheduling}
+
+\subsection{What is process scheduling?}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item In a multiprogramming system, the main idea is to use the resources 
+      fully -- never idly waiting around.
+
+    \item When one process is waiting for e.g.\ I/O, let another process 
+      execute on the CPU.
+
+    \item How to manage this?
+      By using a scheduler.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{switch.pdf}
+    \caption{Context switch from one process to another.
+      Image: \cite{Silberschatz2009osc}.}
+  \end{figure}
+\end{frame}
+
+\subsection{Schedulers}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item There are three types of schedulers.
+      \begin{itemize}
+        \item Long-term scheduler,
+        \item Mid-term scheduler, and
+        \item Short-term scheduler.
+      \end{itemize}
+
+    \item These are used by different systems, and not necessarily in this 
+      structure and by these names.
+
+    \item E.g.\ PC:s usually only have a short-term scheduler.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{description}
+    \item[Long-term scheduler] Comes from purely multiprogramming systems.
+      Jobs are submitted to the system, they are stored on disk.
+      Eventually the long-term scheduler selects a job from disk and loads it 
+      into memory.
+
+    \item[Short-term scheduler] (Also CPU-scheduler) This scheduler chooses 
+      among the processes in memory which is to be allowed to execute on the 
+      CPU.
+      If one process blocks for I/O, then the short-term scheduler quickly 
+      chooses another process and allocates the CPU to that new one.
+
+    \item[Medium-term scheduler] This scheduler is used for swapping out 
+      processes to disk, to free some more memory for the currently executing 
+      processes.
+  \end{description}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{queues.pdf}
+    \caption{Different queues with some PCBs in them.
+      Image: \cite{Silberschatz2009osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{ready.pdf}
+    \caption{An illustration of a process's execution.
+      Image: \cite{Silberschatz2009osc}.}
+  \end{figure}
+\end{frame}
+
+\section[Operations]{Operations on Processes}
+
+\subsection{How does processes come into being?}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Upon boot, the kernel is loaded.
+    \item The kernel in turn starts the first process: init, with PID 0.
+    \item A process can spawn other processes, i.e.\ children, and thus being 
+      their parent.
+    \item This can be done with the fork(2) system call.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{proctree.pdf}
+    \caption{An example of a process tree from a Solaris system.
+      Image: \cite{Silberschatz2009osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{fork.pdf}
+    \caption{An illustration of the UNIX fork(2) system call.
+      Image: \cite{Silberschatz2009osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item The parent then waits for its children to finish, using the wait(2) 
+      system call.
+
+    \item An alternative is to kill the children, using the kill(2) system 
+      call.
+
+    \item If the parent exits, using the exit(2) system call, then the children 
+      are assigned a new parent, namely the special init process.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item We also have the exec(2) system call, which replaces the calling 
+      process with another process.
+  \end{itemize}
+\end{frame}
+
+\section[IPC]{Interprocess Communication (IPC)}
+
+\subsection{Independent vs cooperating}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item A process can be independent if it works on its own.
+    \item If it doesn't work on its own, it's cooperating, i.e.\ it can affect 
+      other processes behaviour.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}{Reasons for cooperating}
+  \begin{description}
+    \item[Information sharing] Concurrent access to the same file by several 
+      users.
+
+    \item[Computation speed-up] Break a given task into subtasks and let 
+      different processes execute the different subtasks, the collect the 
+      results.
+
+    \item[Modularity] Replacing one process if we want to do one part 
+      differently.
+  \end{description}
+\end{frame}
+
+\subsection{Different types of IPC}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{ipc.pdf}
+    \caption{Two categories of IPC: (a) message-passing, (b) shared memory.
+      Image: \cite{Silberschatz2009osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Several ways to implement message-passing.
+    \item A few examples are:
+      \begin{itemize}
+        \item Pipes,
+        \item Local procedure calls (LPC),
+        \item Sockets,
+        \item RPC (uses sockets),
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{rpc.pdf}
+    \caption{An example of an RPC.
+      Image: \cite{Silberschatz2009osc}.}
+  \end{figure}
+\end{frame}
+
+
+\section[Test C src]{Testing the C examples in the book}
+
+\subsection{Compiling}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Download source from website, or just write it in any text editor 
+      (same as for Python).
+
+    \item Go to the directory where the source file is stored.
+
+    \item Compile the source code into executable code.
+
+    \item Run!
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\insertsubsectionhead}
+  \begin{terminal}
+$ ${EDITOR} example.c
+$ cc -o example example.c
+[some output]
+$ ./example
+  \end{terminal}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[allowframebreaks]{Referenser}
+  \small
+  \printbibliography
+\end{frame}
+
+\end{document}
+

@@ -1,0 +1,280 @@
+% $Id$
+% Author:	Daniel Bosk <daniel.bosk@miun.se>
+%\documentclass[handout]{beamer}
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[swedish,english]{babel}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage[today,nofancy]{svninfo}
+\usepackage[natbib,style=alphabetic,maxbibnames=99,backend=bibtex8]{biblatex}
+\addbibresource{literature.bib}
+
+\svnInfo $Id$
+
+\mode<presentation>
+{
+  \usetheme{Frankfurt}
+  \setbeamercovered{transparent}
+  \usecolortheme{seagull}
+}
+%\def\newblock{\hskip .11em plus .33em minus .07em}
+\setbeamertemplate{footline}{\insertframenumber}
+
+\title{%
+  System Organisation and Structure
+}
+\author{Daniel Bosk\footnote{%
+	\tiny
+  This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 
+  Unported license.
+	To view a copy of this license, visit 
+	\url{http://creativecommons.org/licenses/by-sa/3.0/}.
+}}
+\institute[MIUN ICS]{%
+  Department of Information and Communication Systems (ICS),\\
+  Mid Sweden University, Sundsvall.
+}
+\date{\svnId}
+
+
+\AtBeginSection[]{%
+  \begin{frame}<beamer>{Overview}
+		\tableofcontents[currentsection]
+	\end{frame}
+}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Overview}
+	\tableofcontents
+	% You might wish to add the option [pausesections]
+\end{frame}
+
+
+% Since this a solution template for a generic talk, very little can
+% be said about how it should be structured. However, the talk length
+% of between 15min and 45min and the theme suggest that you stick to
+% the following rules:  
+
+% - Exactly two or three sections (other than the summary).
+% - At *most* three subsections per section.
+% - Talk about 30s to 2min per frame. So there should be between about
+%   15 and 30 frames, all told.
+
+
+\section{Computer Systems}
+
+\subsection{Overview of the System Structure}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{syscomponents.pdf}
+    \caption{Abstract view of the components of a computer system.
+      Image: \cite[p.\ 4]{Silberschatz2009osc}.
+    }
+  \end{figure}
+\end{frame}
+
+%\begin{frame}{\insertsubsectionhead}
+%  \begin{itemize}
+%    \item Hardware:
+%      \begin{itemize}
+%        \item CPU,
+%        \item memory,
+%        \item I/O-devices.
+%      \end{itemize}
+%    \item Software:
+%  \end{itemize}
+%\end{frame}
+
+\begin{frame}{\insertsubsectionhead}{User View}
+  \begin{itemize}
+    \item Ease of use of a system.
+    \item Resource utilization.
+    \item Can be on different systems: workstation, server, mainframe.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}{System View}
+  \begin{itemize}
+    \item Resource allocator.
+    \item Control program.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{services.pdf}
+    \caption{A detailed view of the operating system structure.
+      Image: \cite[p.\ 50]{Silberschatz2009osc}.
+    }
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{sysstruct.pdf}
+    \caption{A systematic overview of a computer system.
+      Image: \cite[p.\ 8]{Silberschatz2009osc}.
+    }
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Bootstrap program.
+    \item Interrupts.
+    \item System calls.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{interrupt.pdf}
+    \caption{Timeline for interrupt processing and process execution.
+      Image: \cite[p.\ 9]{Silberschatz2009osc}.
+    }
+  \end{figure}
+\end{frame}
+
+\subsection{Storage}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Random-access memory.
+    \item von Neumann architecture.
+    \item Instruction registers.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Primary and secondary storage.
+    \item Volatile and non-volatile storage.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.8\textheight]{storagehier.pdf}
+    \caption{Storage-device hierarchy.
+      Image: \cite[p.\ 11]{Silberschatz2009osc}.
+    }
+  \end{figure}
+\end{frame}
+
+\subsection{I/O Structure}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Controllers.
+    \item Device driver.
+    \item Direct-memory access (DMA).
+  \end{itemize}
+\end{frame}
+
+\subsection{Architecture}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.8\textheight]{arch.pdf}
+    \caption{Overview of computer architecture.
+      Image: \cite[p. 13]{Silberschatz2009osc}.
+    }
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{smp.pdf}
+    \caption{Symmetric multiprocessing architecture (SMP).
+      Image: \cite[p.\ 15]{Silberschatz2009osc}.
+    }
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{cluster.pdf}
+    \caption{A clustered system.
+      Image: \cite[p.\ 18]{Silberschatz2009osc}.
+    }
+  \end{figure}
+\end{frame}
+
+\subsection{OS Structure}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Multiprogramming.
+    \item Time-sharing, multitasking.
+    \item Interactive computer system.
+    \item Batch processing.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.8\textheight]{multiprog.pdf}
+    \caption{Memory layout for a multiprogramming system.
+      Image: \cite[p.\ 19]{Silberschatz2009osc}.
+    }
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item User and kernel mode.
+    \item Mode bit.
+    \item Privileged instructions.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{dualmode.pdf}
+    \caption{Example of transition from user to kernel mode.
+      Image: \cite[p.\ 21]{Silberschatz2009osc}.
+    }
+  \end{figure}
+\end{frame}
+
+\subsection{Caching}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{cache.pdf}
+    \caption{Transfer of \(A\) from disk to register.
+      Image: \cite[p.\ 28]{Silberschatz2009osc}.
+    }
+  \end{figure}
+\end{frame}
+
+\subsection{Virtual machines}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.8\textheight]{vm.pdf}
+    \caption{An illustration of virtual machines compared to non-virtual 
+      machines.
+      Image: \cite{Silberschatz2013intl}.
+    }
+  \end{figure}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[allowframebreaks]{Referenser}
+  \small
+  \printbibliography
+\end{frame}
+
+\end{document}
+

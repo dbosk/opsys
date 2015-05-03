@@ -1,0 +1,80 @@
+% $Id$
+% Author:	Daniel Bosk <daniel.bosk@miun.se>
+% Date:		17 Dec 2012
+\documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[swedish,english]{babel} % english default language
+\usepackage[hyphens]{url}
+\usepackage{hyperref}
+\usepackage{prettyref,varioref}
+\usepackage[numbers,square]{natbib}
+\usepackage{color}
+\usepackage{listings}
+\bibliographystyle{plainnat}
+
+\title{Laboratory Report on Paging Algorithms}
+\author{Daniel Bosk}
+\date{\today}
+
+%\lstset{style=term}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+	An abstract summarizing the report in at most 200 words.
+\end{abstract}
+
+
+\section{Introduction}
+\label{sec:Intro}
+A gentle introduction for the reader \dots
+
+
+\section{Theory}
+\label{sec:Theory}
+A short descriptions of the algorithms in question \dots with references to
+\citet{Silberschatz2009osc,Silberschatz2013intl,Silberschatz2013osc}.
+
+
+\section{Results}
+\label{sec:Results}
+The hard-earned results \dots
+
+Reference string X generated Y page-faults of Z possible, see the data in 
+\prettyref{app:Data}.
+
+
+\section{Analysis}
+\label{sec:Analysis}
+Analyze and try to explain the results.
+Draw conclusions which are then summarized in \prettyref{sec:Conclusion}.
+
+
+\section{Conclusion}
+\label{sec:Conclusion}
+Here you summarize the following:
+\begin{enumerate}
+	\item Answer whether the algorithms are correctly implemented or not?
+	\item Provide a reference string which generates a minimum page-fault rate 
+		for each algorithm.
+	\item Provide a reference string which generates a maximum page-fault rate 
+		for each algorithm.
+	\item Provide evidence of Belady's anomaly for the algorithms suffering from 
+		it.
+\end{enumerate}
+
+
+\bibliography{literature}
+
+\appendix
+
+\section{Data}
+\label{app:Data}
+Reference strings and corresponding output are given here.
+The first FIFO-experiment yielded the following data.
+The reference string:
+\lstinputlisting{fifo-refstr.txt}
+And the resulting output from the program:
+\lstinputlisting{fifo-result.txt}
+
+\end{document}

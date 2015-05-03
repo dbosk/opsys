@@ -1,0 +1,267 @@
+% $Id$
+% Author: Daniel Bosk <daniel.bosk@miun.se>
+\documentclass[a4paper]{miunasgn}
+\usepackage[utf8]{inputenc}
+\usepackage[swedish,english]{babel}
+\usepackage{url,hyperref}
+\usepackage{prettyref,varioref}
+\usepackage[longnamesfirst]{natbib}
+\usepackage[binary,amssymb,noams]{SIunits}
+\usepackage[nofancy,today]{svninfo}
+\usepackage[natbib,varioref,prettyref]{miunmisc}
+
+\svnInfo $Id$
+
+%\printanswers
+
+\courseid{DT141G}
+\course{Operating Systems}
+\assignmenttype{Theory assignment}
+\title{Storage}
+\author{Daniel Bosk\footnote{%
+	This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 
+	Unported license.
+	To view a copy of this license, visit 
+	\url{http://creativecommons.org/licenses/by-sa/3.0/}.
+}}
+\date{\svnId}
+
+\begin{document}
+\maketitle
+\thispagestyle{foot}
+\tableofcontents
+
+
+\section{Aim}
+\label{sec:Aim}
+The aim of the assignment is, first, to aid your understanding of the treated 
+content by providing questions and problems which inspire reflection.
+Second, it is to examinate the following:
+\begin{itemize}
+	\input{aims.tex}
+\end{itemize}
+
+
+\section{Prerequisites}
+\label{sec:Prerequisites}
+\input{literature.tex}
+
+
+\section{Tasks}
+\label{sec:Work}
+\begin{questions}
+	\question\label{q:file}
+	In the context of computer file-systems, define the term \emph{file}.
+	\begin{solution}
+		A \emph{file} is a named logical storage-unit, which the operating system 
+		uses to abstract the usage of its storage system \cite[p.  
+		421]{Silberschatz2009osc}.
+		The files are then mapped onto a physical storage-device.
+
+		\citeauthor{Silberschatz2009osc} continue by saying that ``a file is the 
+		smallest allotment of logical secondary storage'' \cite[p.  
+		422]{Silberschatz2009osc}.
+		The file thus contains information, the organization of which is up to the 
+		creator of the file.
+
+		The above is sufficient for answering the question.
+
+		Apart from contents, a file has both attributes and operations \citep[pp.  
+		422--423]{Silberschatz2009osc}.
+		Some of the attributes a file can have are
+		\begin{itemize}
+			\item a human-readable name,
+			\item an identifier in the file system,
+			\item a location of the file on a device,
+			\item a size,
+			\item some access-control information, and
+			\item time-stamps when the file was created, last accessed, etc.
+		\end{itemize}
+
+		To complete the definition of file, we must state the operations which can 
+		be performed on a file.
+		According to \citet[p. 423]{Silberschatz2009osc} these operations are (at 
+		least)
+		\begin{itemize}
+			\item creating a new file,
+			\item writing to a file,
+			\item reading from a file,
+			\item seeking to a given position within a file,
+			\item deleting an existing file, and finally
+			\item truncating an existing file discarding all contents but keeping the 
+				attributes.
+		\end{itemize}
+	\end{solution}
+
+	\question\label{q:directories}
+	Define the terms
+	\begin{parts}
+		\part \emph{directory},
+		\part \emph{path}, and
+		\part \emph{search path}.
+	\end{parts}
+	\begin{solution}
+		A \emph{directory} is a logical part of the file system.
+		It is used to ease the organization of files.
+		Each directory contains a list of all files it contains \cite[p.  
+		435]{Silberschatz2009osc}.
+		This list also includes subdirectories of that directory \cite[p.  
+		439]{Silberschatz2009osc}.
+
+		A \emph{path}, or \emph{path name}, is a directory traversal from the root, 
+		in the case of an \emph{absolute} path, or from the current working 
+		directory, in the case of a \emph{relative} path, to a given file or 
+		directory in the file system \cite[p.  439]{Silberschatz2009osc}.
+		For each directory on this path, starting from the beginning, the operating 
+		system opens the directory entry and finds the next directory or file in 
+		the path and then proceeds.
+
+		The \emph{search path} is a list of path names to directories which are 
+		searched by the shell when a command is given \cite[p.  
+		438]{Silberschatz2009osc}.
+	\end{solution}
+
+	\question\label{q:mounting}
+	When a file system is mounted onto a mount point which is a directory already 
+	containing files, those files will no longer be visible until the file system 
+	is unmounted again \cite[pp. 444--445]{Silberschatz2009osc}.
+	Why is that?
+	\begin{solution}
+		The problem becomes obvious when you ask yourself the question \emph{In 
+		which file system would we create a new file?}.
+		Changing existing files is not a problem, as the operating system can open 
+		them for reading and writing.
+		Although, both directories, one in each file system, have to be searched 
+		for the file.
+		The problem appears when the user wants to create a non-existent file, the 
+		operating system cannot possibly know in which directory to create an entry 
+		for the file.
+		As the mounting of a file system is transparent to the user the user does 
+		not even know that there are two possible file systems and thus cannot 
+		notify the operating system in any way which file system to use.
+
+		A possible solution would be to always create new files in the directory of 
+		the file system using the other directory as a mount point.
+		Since we did mount another file system here it is reasonable to assume we 
+		are interested in using it, but this is, of course, not always true.
+	\end{solution}
+
+	\question\label{q:filesystems}
+	You have a system which groups the disk blocks into \unit{4}{\kibi\byte} 
+	sized clusters.
+	You are given the following two file systems.
+
+	First, a FAT-based file system.
+	The FAT maps clusters and not physical disk blocks.
+	It uses 32-bit numbers for the clusters.
+
+	Second, an inode-based file system.
+	An inode contains 16 pointers, each of which is 32 bits in size.
+	The first 13 point directly to clusters.
+	The next points to a single indirect block, i.e.\ a cluster of direct 
+	pointers.
+	The next-to-last points to a double indirect block and the last points to 
+	a triple indirect block.
+	\begin{parts}
+		\part Find the maximum size of a single file in each file system.
+		\part How much space is wasted on meta data in each file system?
+	\end{parts}
+	Remember to get the units right.
+	\begin{solution}
+		In the FAT-based file system the maximum size of a file is \[
+			2^{32}\cdot 4096 = 2^{32}\cdot 2^{12} = 2^{44},
+		\] that is \unit{16}{\tebi\byte}.
+		This means that one file has allocated all clusters.
+
+		As the FAT-scheme requires one pointer per cluster \cite[cf. p.  
+		475]{Silberschatz2009osc} the space required for meta data in the 
+		FAT-scheme is \(2^{32}\cdot 4 = \unit{16}{\gibi\byte}.\)
+
+		In the inode-based file system the maximum size of a file is given by the 
+		sum of the following three equations.
+		For the first 14 direct pointers we have
+		\begin{equation}
+			\label{eq:direct}
+			14\cdot 4096 = 7\cdot 2^3\cdot 2^{10} = \unit{56}{\kibi\byte}.
+		\end{equation}
+		For the single indirect pointers we have an entire cluster of direct 
+		pointers, thus
+		\begin{equation}
+			\label{eq:singleindirect}
+			\frac{4096}{4}\cdot 4096 = 2^{10}\cdot 2^{12} = 2^{22} 
+			= \unit{4}{\mebi\byte}
+		\end{equation}
+		of data.
+		For the double indirect pointers we get as much space for direct pointers 
+		as data \prettyref{eq:singleindirect}, hence we get
+		\begin{equation}
+			\label{eq:doubleindirect}
+			\frac{2^{22}}{4}\cdot 4096 = 2^{20}\cdot 2^{12} = 2^{32} 
+			= \unit{4}{\gibi\byte}
+		\end{equation}
+		of data here.
+		Similarily, using the triple indirect pointers we get
+		\begin{equation}
+			\label{eq:tripleindirect}
+			\frac{2^{32}}{4}\cdot 4096 = 2^{30}\cdot 2^{12} = 2^{42} 
+			= \unit{4}{\tebi\byte}.
+		\end{equation}
+		Adding these equations together yields a maximum file size of just above 
+		\unit{4}{\tebi\byte}.
+
+		The space required for meta data in the inode-scheme is \[
+			16\cdot 4 + 2^{12} + ( 2^{12} + 2^{22} ) + ( 2^{12} + 2^{22} + 2^{32} 
+			) < 2^{33} = \unit{8}{\gibi\byte},
+		\] which is way less than \(4\cdot 2^{32}\) as in the FAT-scheme.
+	\end{solution}
+
+	\question\label{q:ssd}
+	Given a solid-state disk (SSD), which disk-scheduling algorithm would you 
+	like your operating system to use for I/O-scheduling?
+	The available algorithms in your operating system is FCFS, SSTF, SCAN, 
+	C-SCAN, LOOK, and C-LOOK.
+	Motivate your choice well.
+	\begin{solution}
+		As all blocks on an SSD disk are accessed equally fast, independent of 
+		previously accessed blocks, the FCFS is the best choice.
+		The FCFS is the most fair among the algorithms.
+
+		All other algorithms are adapted to disks with non-constant access time 
+		\cite[cf. sec. 12.4]{Silberschatz2009osc}, which includes seek time and 
+		rotational latency, this is not the case for SSD disks.
+	\end{solution}
+
+	\question\label{q:raid}
+	You are tasked to set up the server storing the home folders for all users in 
+	the company.
+	Each user's home folder will then be mounted using a DFS, perhaps NFS.
+	The characteristics for the users vary from editing film material (huge 
+	files!) to simple text-file editing and web-browser caching.
+	There are at the moment approximately 200 users, but the company is 
+	continously expanding.
+	At your disposal you have 20 disks of \unit{2}{\tera\byte} each and 
+	accompanying host-bus adapters.
+	A backup is performed each night, but if a user has to wait for a restore 
+	from backup you will be hung by your feet in the foyer of the company 
+	building -- these backups are only for saving the users from their own 
+	mistakes.
+	Furthermore, if the system is too slow, the users will be frustrated and also 
+	hang you by your feet.
+	How do you make use of the disks?
+	\begin{solution}
+		Obviously we need some kind of RAID-based solution.
+		We need to account for both performance and security.
+		We will need both high write-performance and read-performance.
+
+		Judging from section 12.7.3 in \cite{Silberschatz2009osc}, RAID level 1+0 
+		is a good choice.
+		However, RAID levels 5 and 6 are also accepted.
+	\end{solution}
+\end{questions}
+
+
+%%% EXAMINATION %%%
+\input{examination.tex}
+
+\bibliography{literature}
+\end{document}

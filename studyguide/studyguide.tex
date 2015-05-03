@@ -1,0 +1,307 @@
+% $Id$
+% Author: Daniel Bosk <daniel.bosk@miun.se>
+\documentclass[a4paper,logo]{miunart}
+\usepackage[utf8]{inputenc}
+\usepackage{prettyref,varioref}
+\usepackage[swedish,english]{babel}
+\usepackage[hyphens]{url}
+\usepackage{hyperref}
+\usepackage[today,nofancy]{svninfo}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage[natbib,style=numeric-comp,maxbibnames=99,sorting=none,backend=bibtex8]{biblatex}
+\addbibresource{literature.bib}
+\usepackage[prettyref,varioref,listings]{miunmisc}
+
+\svnInfo $Id$
+
+\title{The Complete Studyguide for the Course\\
+  DT141G Operating Systems}
+\author{Daniel Bosk\footnote{%
+  This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 
+  Unported license.
+  To view a copy of this license, visit 
+  \url{http://creativecommons.org/licenses/by-sa/3.0/}.
+}}
+\date{\svnId}
+
+\begin{document}
+\maketitle
+
+
+\section{Aims}
+
+The overviewing aim of the course is to give the student an understanding of 
+how computer systems work, this includes all systems from a mobile phone or 
+router to a high-performance server.
+Focus is on the operating system which connects hardware with software and 
+ultimately with its human users.
+
+More specifically, after successfully completing this course you should have 
+fulfilled the following aims:
+\begin{itemize}
+%  \input{overview-aim.tex}
+%  \input{process-aim.tex}
+%  \input{memory-aim.tex}
+%  \input{paging-aim.tex}
+%  \input{storage-aim.tex}
+%  \input{distributed-aim.tex}
+  \input{exam-aim.tex}
+\end{itemize}
+
+
+\section{Course overview}
+
+The book used for this course is \citetitle{Silberschatz2013intl} by 
+\citet{Silberschatz2013intl}.
+This book provides a sufficient foundation for students in Computer Science.
+This course covers most parts of the book.
+Note that this book differs a little from another edition of the same book.
+The one above is the ``International Student Version'', and is a cheaper 
+version of the book.
+However, in this course we will also talk about two chapters from the standard 
+edition \cite{Silberschatz2013osc}.
+These two chapters are Chapter 16 ``Virtual Machines'' and Chapter 17 
+``Distributed Systems''.
+These areas are interesting for you, but we will not include them in the 
+examination.
+
+The aims of the course are examined using a written exam.
+There are assignments of both theoretical and laboratory nature, although most 
+of them are theoretical, which are for your learning of the material.
+They do help you to prepare for the exam.
+There is a strong correlation between students who pass the exam and students 
+who have done the assignments before taking the exam.
+
+%However, there are some parts of chapter 14 which can be skipped.
+%In chapter 14 you need only read sections 14.1--14.8.
+%Chapter 15 \emph{System Security} can be read lightly, the content of this 
+%chapter will be the focus in other courses.
+%Chapters 19--22 covering special purpose systems and case studies may be read 
+%lightly as well.
+
+The assignments are numbered starting from zero, this number is prefixed with 
+`T' for theoretical and `L' for laboratory assignments.
+Each assignment instruction, for both laboratory and theoretical ones, contains 
+reading instructions.
+These reading instructions are also given here, in the following sections, 
+along with the reading instructions for the lectures.
+
+The only assignment which is mandatory is T0, this assignment must be handed-in 
+within the first three weeks of the course.
+See \prettyref{sec:exam} for details.
+The other assignments are awarded bonus points if handed in and passed before 
+the deadline.
+After the deadline the assignment will be covered during a tutoring session, 
+and hence no solutions will be accepted for submission after that.
+
+The lectures aim to give an overview of the topic, to ease your reading of the 
+material, and to focus on the parts usually found most difficult by students.
+This means you will still \emph{have to read the book} even if you attend the 
+lectures.
+The study stategy recommended for this course is to read the material during 
+the corresponding week, attend the corresponding lecture, then do the 
+assignment.
+Should any problems arise, then you bring those up during one of the tutoring 
+sessions.
+
+A timetable for the course is given in \prettyref{tbl:Timetable}.
+The table is adapted for a study rate at 50 percent and should be used as an 
+indicator of when to have read what.
+
+\begin{table}
+  \centering
+  \begin{tabular}{cp{10cm}}
+    \toprule
+    \textbf{Course Week} & \textbf{Teaching and Course Work}\\
+    \toprule
+    1
+        & Introductory lecture.\\
+        & Lecture on system overview.\\
+        & T0 Overview.\\
+        & Tutoring session.\\
+    \midrule
+    2
+        & Lecture on system structure.\\
+        & Tutoring session.\\
+    \midrule
+    3
+        & Lectures on processes, part I.\\
+        & Lectures on processes, part II.\\
+        & Lectures on processes, part III.\\
+        & Lectures on processes, part IV.\\
+        & T1 Processes.\\
+        & Tutoring session.\\
+    \midrule
+    4
+        & Lectures on memory, part I.\\
+        & T2 Memory.\\
+        & Lectures on memory, part II.\\
+%        & Lectures on memory, part III.\\
+        & L3 Paging Algorithms.\\
+        & Tutoring session.\\
+    \midrule
+    5
+        & Lectures on storage, part I.\\
+        & T4 Storage.\\
+        & Lectures on storage, part II.\\
+%        & Lectures on storage, part III.\\
+%        & Lectures on storage, part IV.\\
+%        & L5 Disk Algorithms.\\
+        & Tutoring session.\\
+    \midrule
+    6
+        & Lecture on distributed systems.\\
+%        & Lectures on distributed systems, part I.\\
+%        & T5 Distributed Systems.\\
+%        & Lectures on distributed systems, part II.\\
+%        & Lectures on distributed systems, part III.\\
+        & Lecture on various operating systems.\\
+        & Tutoring session.\\
+    \midrule
+    7
+        & Lecture on virtual machines.\\
+%        & T6 Virtual Machines.\\
+%        & Lecture on protection and security.\\
+        & Tutoring session.\\
+    \midrule
+    8
+        & Independent study for exam.\\
+    \midrule
+    9
+        & Independent study for exam.\\
+        & Final tutoring session.\\
+    \midrule
+    10
+        & Final exam.\\
+    \bottomrule
+  \end{tabular}
+  \caption{A timetable for the course given at a study rate of 50 percent.}
+  \label{tbl:Timetable}
+\end{table}
+
+\subsection{Introductory lecture}
+\input{intro-lit.tex}
+
+\subsection{Lectures on system overview and system structure}
+\input{struct-lit.tex}
+
+\subsection{T0 Overview}
+\input{overview-lit.tex}
+
+\subsection{Lectures on process management}
+\begin{enumerate}
+  \item \input{proc-lit.tex}
+
+  \item \input{thread-lit.tex}
+
+  \item \input{sched-lit.tex}
+
+  \item \input{sync-lit.tex}
+\end{enumerate}
+
+\subsection{T1 Processes}
+\input{process-lit.tex}
+
+\subsection{Lectures on memory management}
+\begin{enumerate}
+  \item \input{physmem-lit.tex}
+
+  \item \input{vmem-lit.tex}
+\end{enumerate}
+
+\subsection{T2 Memory}
+\input{memory-lit.tex}
+
+\subsection{L3 Paging Algorithms}
+\input{paging-lit.tex}
+
+\subsection{Lectures on storage management}
+\begin{enumerate}
+  \item \input{introfs-lit.tex}
+
+  \item \input{lectfs-lit.tex}
+
+%  \item \input{stor-lit.tex}
+%
+%  \item \input{io-lit.tex}
+\end{enumerate}
+
+\subsection{T4 Storage}
+\input{storage-lit.tex}
+
+%\subsection{L5 Disk Algorithms}
+%\input{fs-lit.tex}
+
+\subsection{Lecture on distributed systems}
+\input{distsys-lit.tex}
+
+%\subsection{T6 Distributed Systems}
+%\input{distributed-lit.tex}
+
+\subsection{Lecture on various operating systems}
+\input{systems-lit.tex}
+
+\subsection{Lecture on virtual machines}
+\input{vm-lit.tex}
+
+%\subsection{T7 Virtual Machines}
+%\input{vmtheory-lit.tex}
+
+
+\section{Examination}
+\label{sec:exam}
+As noted above the course is examined using an introductory theory assignment, 
+``T0 Overview'', and a written exam.
+The theory assignment is graded pass (P) or fail (F) and is reported as I101 in 
+Ladok.
+The final exam is graded A, B, C, D, E for pass or F, Fx for fail.
+The exam is reported as T101 in Ladok, and it corresponds to 7.5 credit points.
+
+To finish the course you need to pass the above and the grade of the exam will 
+be the final grade on the course total.
+
+% XXX rethink the bonus system
+Each completed assignment, which is correct and handed in before deadline, will 
+be awarded one bonus point for the exam.
+
+
+\section{What if I'm not done in time?}
+\label{sec:late}
+The deadlines on this course are of great importance.
+You must have completed the first assignment, \emph{T0 Overview}, within its 
+deadline.
+If you do not do this you will be deregistered from the course and your place 
+will be open to other applicants.
+
+The other theory and laboratory assignments must be handed in before deadline 
+for a chance to collect bonus points.
+These assignments are graded sometime after deadline and at the latest before 
+the first exam.
+This depends on the work load of the tutor.
+The correct solutions will be covered in detail during the first tutoring 
+session after deadline, hence the inurgency to grade them quickly and if you 
+miss the deadline you have missed the possibility.
+
+Note that the bonus points are only valid during the first exam.
+
+No tutoring is planned after the end of the course, i.e.\ after the last 
+tutoring session scheduled in the course schedule.
+If you are not done with your assignments during the course and want to be 
+guaranteed tutoring you have to reregister for the next time the course is 
+given.
+Reregistration is a lower priority class of applicants for a course, all 
+students applying for the course the first time have higher priority -- this 
+includes students in reserve places too.
+
+A final note, if you feel that you will not be done with the course on time, it 
+is better to stop the course at an early stage.
+If you register a break within three weeks of the course start, you will be in 
+the higher priority class of applicants the next time you apply for the course.
+You can register such a break yourself in the Student Portal.
+Please contact the Student Office for further information regarding this early 
+break from the course.
+
+
+\printbibliography
+\end{document}

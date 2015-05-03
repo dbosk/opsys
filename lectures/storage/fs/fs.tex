@@ -1,0 +1,424 @@
+% $Id$
+% Author:	Daniel Bosk <daniel.bosk@miun.se>
+%\documentclass[handout]{beamer}
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[swedish,english]{babel}
+\usepackage{url}
+\usepackage{varioref,prettyref}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage[today,nofancy]{svninfo}
+\usepackage[natbib,style=alphabetic,maxbibnames=99,backend=bibtex8]{biblatex}
+\addbibresource{literature.bib}
+\usepackage[listings,varioref,prettyref]{miunmisc}
+
+\svnInfo $Id$
+
+\mode<presentation>
+{
+  \usetheme{Frankfurt}
+  \setbeamercovered{transparent}
+  \usecolortheme{seagull}
+}
+%\def\newblock{\hskip .11em plus .33em minus .07em}
+\setbeamertemplate{footline}{\insertframenumber}
+
+\title{%
+  Implementing File System
+}
+\author{Daniel Bosk\footnote{%
+	\tiny
+  This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 
+  Unported license.
+	To view a copy of this license, visit 
+	\url{http://creativecommons.org/licenses/by-sa/3.0/}.
+}}
+\institute[MIUN ICS]{%
+  Department of Information and Communication Systems (ICS),\\
+  Mid Sweden University, Sundsvall.
+}
+\date{\svnId}
+
+
+\AtBeginSection[]{%
+  \begin{frame}<beamer>{Overview}
+		\tableofcontents[currentsection]
+	\end{frame}
+}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Overview}
+	\tableofcontents
+	% You might wish to add the option [pausesections]
+\end{frame}
+
+
+% Since this a solution template for a generic talk, very little can
+% be said about how it should be structured. However, the talk length
+% of between 15min and 45min and the theme suggest that you stick to
+% the following rules:  
+
+% - Exactly two or three sections (other than the summary).
+% - At *most* three subsections per section.
+% - Talk about 30s to 2min per frame. So there should be between about
+%   15 and 30 frames, all told.
+
+\section{File Systems}
+
+\subsection{File-System Structure}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item The disk stores data in blocks, normally 512 to 4096 bytes.
+
+    \item FS provides an easy and convenient way of accessing this data.
+
+    \item The first problem is how the FS should look to the user.
+
+    \item The second problem is creating algorithms and data structures to map 
+      the logical file system (what the user sees) onto the physical secondary 
+      storage devices.
+
+    \item We will now focus on the second problem.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{fshier.pdf}
+    \caption{Layered hierarchy of file system structure.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}{I/O Control}
+  \begin{itemize}
+    \item This layer consists of device drivers and interrupt handlers.
+
+    \item This layer transfers information between memory and disk.
+
+    \item From upper layers: fetch block 123.
+
+    \item To lower layers: hardware specific instructions.
+
+    \item It ususally writes specific bit patterns (magic numbers) to special 
+      locations in the I/O controller's memory.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}{Basic File System}
+  \begin{itemize}
+    \item The basic file system issues generic commands to the appropriate 
+      device driver; read from block \(X\), write to block \(Y\).
+
+    \item Each physcial block is identified by its numeric disk address; e.g.\ 
+      drive 1, cylinder 73, track 2, sector 10.
+
+    \item This layer also manages buffers and caches that hold various 
+      directory and data blocks.
+
+    \item The manager allocated a block in the buffer before transfer can 
+      occur.
+      Thus is needs to keep track of free places in the buffer, and free space 
+      when there is none.
+
+    \item The caches are to speed up system performance, these must be kept 
+      up-to-date to make this work.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}{File-Organisation Module}
+  \begin{itemize}
+    \item This part of the FS keeps track of actual files and maps these to 
+      their blocks in the physical device.
+
+    \item The file-organisation module translates logical block addresses to 
+      physical block addresses for the basic file system to transfer.
+
+    \item This layer also keeps track of free physical blocks in the device.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}{Logical File System}
+  \begin{itemize}
+    \item This layer manages meta-data information, i.e.\ everything except the 
+      actual data (file contents).
+
+    \item The logical file system manages the directory structure.
+
+    \item It converts symbolic file names into the IDs the file-organisation 
+      module needs.
+
+    \item It maintains this information in a file-control block (FCB), or 
+      inode.
+
+    \item This layer is also responsible for protection and security, so it has 
+      access permissions for all files.
+
+  \end{itemize}
+\end{frame}
+
+\subsection{Volumes}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Each volume contains a boot control block and a volume control block.
+
+    \item In UFS the boot control block is called the boot block and the volume 
+      control block is called a superblock.
+
+    \item In NTFS it's called the partition boot sector.
+      The volume control block is called the master file table (MFT).
+
+    \item A directory structure is used to organise the files: in UFS, these 
+      include file names and inode numbers;
+      in NTFS this is stored in the MFT.
+
+    \item Finally, a per file FCB has all information about a file, it contains 
+      a unique identifier to match directory entries.
+      (In NTFS this is in the MFT.)
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Data about the FS is kept in memory via caches.
+    \item This data is loaded on mount time.
+    \item It's updated during operation.
+    \item It's discarded on dismount.
+  \end{itemize}
+\end{frame}
+
+\subsection{Kernel Data-Structures}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item The OS keeps an in-memory mount table about each mounted volume.
+      (Look at mount(8).)
+
+    \item An in-memory directory-structure cache holds the directory 
+      information about recently accessed directories.
+      (Try \term{time find /some/subdir -print > /dev/null} two times in 
+      a row.)
+
+    \item The system-wide open-file table keeps a copy of the FCB of each open 
+      file.
+      (Look at lsof(8).)
+
+    \item The per-process open-file table keeps a pointer to the appropriate 
+      entry in the system-wide open-file table.
+
+    \item Buffers hold file-system blocks when they are being read from or 
+      written to disk.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\insertsubsectionhead}
+  \begin{terminal}
+\$ time find ~ -print > /dev/null
+real    0m47.535s
+user    0m0.479s
+sys     0m1.779s
+\$
+  \end{terminal}
+  \begin{terminal}
+\$ time find ~ -print > /dev/null
+real    0m0.180s
+user    0m0.080s
+sys     0m0.100s
+\$
+  \end{terminal}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{fcb.pdf}
+    \caption{A typical file-control block.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\subsection{Operations on Files}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item A process which wants to create a new file make a request from the 
+      logical file system.
+
+    \item The logical file sytem allocates an FCB, either creates a new or take 
+      one of the available in case the FCB:s are created at FS creation.
+
+    \item The open(2) system call passes a symbolic name to the logical file 
+      system.
+
+    \item This first searches the system-wide open-file table, if found it 
+      points an entry in the process's open-file table there.
+
+    \item If not found, the directory structure is searched, when found the FCB 
+      is copied into a new entry in the system-wide open-file table.
+
+    \item We must also track how many processes keep the file open.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{openread.pdf}
+    \caption{In-memory file-system structures; (a) file open, (b) file read.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+
+\section{Virtual File Systems}
+
+\subsection{File System Layeres}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{vfs.pdf}
+    \caption{A schematic view of the virtual file system layer.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item The virtual file system (VFS) separates generic operations from their 
+      implementation.
+      I.e.\ each FS implements the VFS interface.
+
+    \item The the OS's FS operations just use the VFS interface, no need to 
+      bother about what's underneath.
+
+    \item This way we can even implement remote file systems like NFS.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{nfs.pdf}
+    \caption{A schematic of VFS with NFS.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+
+\section[Block Allocation]{Block Allocation and Free Block Algorithms}
+
+\subsection{Directories}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item We need to store and represent our directoy structure in some way.
+
+    \item We have to easy alternatives: linear lists and hash tables.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item The linear list is simple.
+
+    \item We simply store the file information in a list, from beginning to 
+      end.
+      
+    \item To create a file we go through the list to see there's no existing 
+      file by that name yet, then we create a new entry.
+
+    \item To remove a file we free its allocated entry, e.g.\ by setting it to 
+      null or replacing it with the last directory entry and reduce the length 
+      of the directory.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item This is computationally bad, since searching through a list takes 
+      time.
+
+    \item It's easier if it's sorted, then the search is faster.
+      Problem is to keep it sorted.
+
+    \item We can use a hash table instead, hash function computes a hash value 
+      from the symbolic name.
+
+    \item Problem is collisions, if the collisions are few and evenly spread we 
+      can use a linked list for this.
+
+  \end{itemize}
+\end{frame}
+
+\subsection{Contiguous Allocation}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{contiguous.pdf}
+    \caption{An example of contiguous allocation of file data.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\subsection{Linked Allocation}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{linked.pdf}
+    \caption{An example of linked allocation of file data.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{fat.pdf}
+    \caption{An example of a file-allocation table (FAT).
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\subsection{Indexed Allocation}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{indexed.pdf}
+    \caption{An example of indexed allocation.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{inode.pdf}
+    \caption{An example of the UFS inode.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[allowframebreaks]{Referenser}
+  \small
+  \printbibliography
+\end{frame}
+
+\end{document}
+

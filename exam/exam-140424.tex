@@ -1,0 +1,279 @@
+% $Id$
+% Author:	Daniel Bosk <daniel.bosk@miun.se>
+\documentclass[addpoints,svv]{miunexam}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[swedish,english]{babel}
+\usepackage{hyperref,url}
+\usepackage{color}
+\usepackage{prettyref,varioref}
+\usepackage{subfigure}
+\usepackage{listings}
+\usepackage[binary]{SIunits}
+\usepackage[varioref,prettyref,listings]{miunmisc}
+\bibliographystyle{alpha}
+
+%\printanswers
+
+\examtype{Final exam}
+\courseid{DT011G}
+\course{Introduction to Operating Systems}
+\date{2014-04-24}
+
+\author{%
+	Daniel Bosk\\
+  {\small\texttt{\href{mailto:daniel.bosk@miun.se}{daniel.bosk@miun.se}}}\\
+  {\small\textit{Phone:} 060\,-\,14\,8709}\\
+}
+
+\begin{document}
+\maketitle
+\thispagestyle{foot}
+
+\section*{Instructions}
+\label{sec:Instructions}
+Carefully read the questions before you start answering them.
+Note the time limit of the exam and plan your answers accordingly.
+Only answer the question, do not write about subjects remotely related to the
+question.
+
+Write your answers on separate sheets, not on the exam paper.
+Only write on one side of the sheets.
+Start each question on a new sheet.
+
+Make sure you write your answers clearly, if I cannot read an answer the answer
+will be awarded no points -- even if the answer is correct.
+The questions are \emph{not} sorted by difficulty.
+
+Note that your answers for this exam does \emph{not} have to include references 
+to relevant literature.
+
+\begin{description}
+	\item[Time] 5 hours.
+  \item[Aids] Dictionary,
+    course literature 
+    \cite{Silberschatz2009osc,Silberschatz2013osc,Silberschatz2013intl},
+    graded assignments,
+    personal notes,
+    and a calculator.
+    The student may use the following e-book reader:
+    TrekStor eBook-reader 3.0.
+	\item[Maximum points] \numpoints
+	\item[Questions] \numquestions
+\end{description}
+
+%\subsection*{Bonus points}
+%\noindent
+%You must get an E or higher, to get the bonus points added to your final grade.
+%Bonus points will be added to this exam and the first re-exam.
+
+\subsection*{Preliminary grades}
+
+To pass this exam you need to have at least an average of one (1) point per 
+question, and no question may be awarded zero points.
+The averages for the grades can be summarised as follows:
+E \(\geq 1\),
+D \(\geq 1.5\),
+C \(\geq 2\),
+B \(\geq 2.5\),
+A \(\geq 3\),
+with no question awarded zero points.
+
+
+\section*{Aim}
+\label{sec:Aim}
+The aim of the exam is to examine that you have fulfilled the requirements 
+specified in the course syllabus.
+
+\clearpage
+\section*{An operating systems oriented computer science fiction,\\
+  or: The exam questions}
+
+\begin{questions}
+  \question[3]\label{q:threads}
+  Your colleague at work, Bill, who always comes to you for help, comes for 
+  your aid today again.
+  He is a nice guy, he always means well.
+  But sometimes things just does not turn out as intended, alright, most of the 
+  times.
+  This time, however, he with an actual problem.
+
+  ``Sorry to bother you again'', he says, ``I was thinking about threads and 
+  processes.''
+  As we know from earlier, Bill maintains an operating system in his spare 
+  time.
+  ``I know I have talked to you about this previously too, but I've forgotten 
+  some of what you said, and I have some new ideas'', he says.
+
+  ``OK, shoot'', you say.
+
+  ``Well, I'm working on handling processes and threads.
+  I've looked at how UNIX-like systems does this, but I'm not quite sure 
+  I understand it completely.  Can you explain it to me?''
+
+  Help Bill by explaining how to approach process and thread handling.
+  More specifically, tell Bill about:
+  \begin{parts}
+    \part[3] The advantages of the Linux implementation of the fork(2) system 
+    call.
+    \part[3] How the copy-on-write technique works, and why it is good.
+    \part[3] The different ways to handle threads and their advantages.
+  \end{parts}
+  \begin{solution}
+    % XXX rewrite solution for question on threads
+    \dots
+  \end{solution}
+
+  \question[3]\label{q:deadlock}
+  By the end of the day your telephone rings, it is your not-so-tech-savy 
+  friend.
+  He is by the way a rather enthusiastic fellow, some would even go for the 
+  word excentric.
+  It is your friend Steve, and you are going out with Steve and Bill to catch 
+  the latest film in the cinema right after work, you do this every now and 
+  then.
+
+  ``How're you doing'', he says, ``are you and Bill on your way?''
+
+  ``Yes, we'll leave in a few minutes, Linus might also join us'', you say.
+
+  ``Great!  You know I was thinking about what you said about deadlocks a few 
+  months ago.  I'll tell you when you get here.''
+
+  You and Bill leave the office and arrive at the cinema to meet Steve by the 
+  registers to get your tickets.
+
+  ``Linus couldn't join us, he was busy hacking on some features in Linux,'' 
+  you say.
+
+  ``I've never understood why he publishes his code for free on the net'', 
+  Steve says.
+  ``He should do like Bill and start to charge people money for it.''
+
+  ``Well, I think it's quite good'', Bill says, ``this way I can copy some of 
+  his features and incorporate it into my Wall-Hole operating system.  I've 
+  done that from the Berkely Software Distribution.''
+
+  ``About that deadlock-thingy, I was thinking about that on my way from work 
+  the other day.  I was in my car, heading for a round-about.
+  I was thinking, this could turn into a deadlock situation.  Don't you 
+  think?''
+
+  Discuss with Steve whether this is a deadlock or not.
+  \begin{solution}
+    % XXX rewrite solution for deadlock question
+    \dots
+  \end{solution}
+
+  \question\label{q:drivers}
+  After the film has ended you pose the question about threads and processes to 
+  Steve.
+
+  ``Steve, Bill is thinking about whether to choose threads or processes in his 
+  browser, what are your thoughts?''
+
+  ``Certainly he should choose the one easiest for developers.
+  Getting developers to your platform is the key to success'', Steve replies.
+
+  ``Sure, but shouldn't I think first about my users'', Bill asks.
+
+  ``Developers, developers, developers'', Steve starts to chant like obsessed, 
+  shortly continuing to shouting, ``DEVELOPERS, DEVELOPERS, DEVELOPERS!
+  I love that word; some day, if I am to hold a presentation I will start it 
+  with those very words.''
+
+  ``We know that for sure, and so does the rest of the cinema.
+  I solved the networking stuff by copying the the code from BSD, but I do not 
+  know how to solve the interface to the hardware.
+  I have heard of monolithic kernels, loadable kernel modules and drivers; I do 
+  not really know what that means though.''
+
+  You on the other hand, know perfectly well the different approaches to 
+  interface the hardware.
+  Explain to Bill
+  \begin{parts}
+    \part[3] the different types of kernels there are (how they work), and
+    \part[3] what advantages there are of each type.
+  \end{parts}
+  \begin{solution}
+    % XXX write solution to driver question
+    \dots
+  \end{solution}
+
+  \question[3]\label{q:fs}
+  Back in your office trying to work, your boss comes by your desk.
+  ``I've got a wee bit o'problem, laddie,'' he says, ``it concerns the 
+  efficiency of page replacement algorithms.''
+
+  ``Mhm, go on,'' you say.
+
+  ``Well, it's like this, I've got this page-reference string'', he shows you 
+  a paper containing a string of numbers:
+  \begin{quote}
+    1, 2, 3, 4, 1, 1, 2, 4, 5, 5, 6, 8, 7, 8, 8, 9, 9, 9, 9, 1
+  \end{quote}
+  He continues, ``a memory access takes \unit{100}{\nano\second} if the page is 
+  in memory, with a page-fault it takes \unit{10}{\milli\second} to load the 
+  page into memory and another \unit{100}{\nano\second} to complete the 
+  access.''
+
+  You nod and say, ``and you want me to tell you the efficiency of some 
+  algorithms compared to the optimal page-replacement?''
+
+  His eyes are shining, ``exactly, laddie!'' he says enthusiastically.
+  ``It's the second-chance algorithm, there is only a concern of reading, no 
+  writing done to memory.  How does this algorithm perform compared to the 
+  optimal page-replacement algorithm?  We've got only five wee frames to work 
+  with, lad.''
+
+  Do the following calculations and explain them thoroghly:
+  \begin{parts}
+    \part[3] What is the average access time for the optimal page-replacement 
+    algorithm for this reference string?
+
+    \begin{solution}
+      \dots
+    \end{solution}
+
+    \part[3] What is the average access time for the second-chance 
+    page-replacement algorithm for this reference string?
+
+    \begin{solution}
+      \dots
+    \end{solution}
+
+  \end{parts}
+
+  \question[3]\label{q:scheduling}
+  You are back in your office, it is Friday afternoon.
+  Another one of your co-workers comes by.
+  He says to you ``I hope you haven't forgotten about our meeting.
+  You promised me you'd give me some feedback on my ideas for Freax'', and he 
+  smiles.
+  He knows just as well as you do that you did forget about it, it was not in 
+  your calendar and you have been so distracted this week you remember only 
+  fragments.
+
+  ``Well,'' he continues, ``we are supposed to discuss some aspects of 
+  scheduling for my free-time project.''
+  It is your friend Linus, who didn't join you for cinema, and he is actually 
+  an intern from the University of Helsinki.
+  ``What I'd like to do is to have a nice general scheduling algorithm for 
+  processes.
+  Interactive processes should have priority over I/O-bound processes''.
+  The two of you enter the meeting room.
+
+  Give Linus an overview of how to implement his scheduler.
+  \begin{solution}
+    % XXX write a solution to scheduling question
+    \dots
+  \end{solution}
+\end{questions}
+
+Finally Thursday evening, now it is time for a treat after all this hard work.
+\begin{center}
+  \textbf{The end.}
+\end{center}
+
+\bibliography{literature}
+\end{document}

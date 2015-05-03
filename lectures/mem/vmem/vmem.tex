@@ -1,0 +1,390 @@
+% $Id$
+% Author:	Daniel Bosk <daniel.bosk@miun.se>
+%\documentclass[handout]{beamer}
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[swedish,english]{babel}
+\usepackage{url}
+\usepackage{varioref,prettyref}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage[binary,amssymb]{SIunits}
+\usepackage[today,nofancy]{svninfo}
+\usepackage[natbib,style=alphabetic,maxbibnames=99,backend=bibtex8]{biblatex}
+\addbibresource{literature.bib}
+\usepackage[listings,varioref,prettyref]{miunmisc}
+
+\svnInfo $Id$
+
+\mode<presentation>
+{
+  \usetheme{Frankfurt}
+  \setbeamercovered{transparent}
+  \usecolortheme{seagull}
+}
+%\def\newblock{\hskip .11em plus .33em minus .07em}
+\setbeamertemplate{footline}{\insertframenumber}
+
+\title{%
+  Virtual Memory
+}
+\author{Daniel Bosk\footnote{%
+	\tiny
+  This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 
+  Unported license.
+	To view a copy of this license, visit 
+	\url{http://creativecommons.org/licenses/by-sa/3.0/}.
+}}
+\institute[MIUN ICS]{%
+  Department of Information and Communication Systems (ICS),\\
+  Mid Sweden University, Sundsvall.
+}
+\date{\svnId}
+
+
+\AtBeginSection[]{%
+  \begin{frame}<beamer>{Overview}
+		\tableofcontents[currentsection]
+	\end{frame}
+}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Overview}
+	\tableofcontents
+	% You might wish to add the option [pausesections]
+\end{frame}
+
+\begin{frame}{Literature}
+  \input{literature.tex}
+\end{frame}
+
+
+% Since this a solution template for a generic talk, very little can
+% be said about how it should be structured. However, the talk length
+% of between 15min and 45min and the theme suggest that you stick to
+% the following rules:  
+
+% - Exactly two or three sections (other than the summary).
+% - At *most* three subsections per section.
+% - Talk about 30s to 2min per frame. So there should be between about
+%   15 and 30 frames, all told.
+
+
+\section{Virtual Memory}
+
+\subsection{Huge logical but small physical}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item What if we want to run a program which is larger than the physical 
+      memory?
+
+    \item When we run a program we don't necessarily use all of them, some 
+      parts of the code, e.g.\ error handling, isn't always used.
+
+    \item Then why load the entire program into memory?
+      Why not load only the pages of a program used by a process?
+
+    \item This is the idea of virtual memory and demand paging.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item We've already separated the logical address space from the physical 
+      address space by paging and segmentation.
+
+    \item Now we separate it further by virtual memory.
+
+    \item Virtual memory means we pretend as if we have a huge memory, the 
+      virtual memory.
+
+    \item To be able to work with this we need it in physical memory, hence we 
+      place different parts of it in physical memory at any given time.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{vmem.eps}
+    \caption{An illustration of the idea of a larger virtual memory than 
+      physical memory.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Actually, with this approach \emph{each} process can have a huge 
+      virtual memory, seeming to the process that it has all available memory 
+      to itself.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{vaddrspace.eps}
+    \caption{A process's virtual address space.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item With this huge gap in the middle we can fit a huge stack and an 
+      enormous heap.
+
+    \item We can also use the space for other purposes.
+
+    \item We can map in various shared pages there.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{sharedpages.eps}
+    \caption{Shared library using virtual memory.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+
+\section{Demand Paging}
+
+\subsection{What is demand paging?}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{swapping.eps}
+    \caption{The principle of swapping as seen before.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item What if we swapped in and out only parts of the programs?
+
+    \item This is what a lazy swapper does.
+
+    \item A swapper works with entire processes.
+
+    \item As we now see a process as a sequence of pages, we use a \emph{pager} 
+      to swap in and out pages of the process.
+
+    \item For this kind of pager we need some form of hardware support to 
+      detect when a page is needed but not in memory, we use the valid--invalid 
+      bits from before.
+
+  \end{itemize}
+\end{frame}
+
+\subsection{Demand paging}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{lazyswap.eps}
+    \caption{Page table with some pages in memory and some on disk.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item As long as pages are allocated to frames and are in memory everything 
+      works as before.
+
+    \item What happens when the process refers to a page not in memory?
+
+    \item Then the memory unit traps to the OS, it generates a page fault.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{pagefault.eps}
+    \caption{Procedure when a page fault occurs.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Pure demand paging means we never bring a page into memory until it's 
+      needed (by generating a page fault).
+
+    \item The hardware requirements for demand paging are the same as for 
+      paging (with valid--invalid bits) and swapping.
+
+    \item However, it also needs the ability to restart any instruction in the 
+      CPU after a page fault.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item How is the performance of demand paging?
+
+    \item Usually the memory access time is around 10 to 200 nanoseconds.
+
+    \item With no page faults we keep the same performance as usual.
+
+    \item We compute the effective access time as we did before for the TLB.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{block}{Effective access time}
+    The effective access time \(t\) is \[
+      t = (1-p)\times t_m + p\times t_p,
+    \] where \(p\) is the probability of a page fault, \(t_m\) is the memory 
+    access time and \(t_p > 2 t_m\) is the page-fault time.
+  \end{block}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{example}
+    We have \(t_m = \unit{200}{\nano\second}\) and \(t_p 
+    = \unit{8}{\milli\second} = \unit{8000000}{\nano\second}\).
+    We want \(t < \unit{220}{\nano\second}\), i.e.\ less than 10 percent loss.
+    \begin{eqnarray}
+      t &>& (1-p)\times t_m + p\times t_p \\
+      220 &>& (1-p)\times 200 + p\times 8000000 \\
+      220 &>& 200 - p\times 200 + p\times 8000000 \\
+      220 &>& 200 + p\times (8000000 - 200) \\
+      220 &>& 200 + 7999800\times p \\
+      20 &>& 7999800\times p \\
+      \frac{20}{7999800} = 0.0000025 &>& p
+    \end{eqnarray}
+  \end{example}
+\end{frame}
+
+\subsection{Copy-on-Write}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{copyonwrite.eps}
+    \caption{Processes sharing pages.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{copyonwritechange.eps}
+    \caption{One of the processes changes one of the pages.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+
+\section{Page Replacement}
+
+\subsection{Need for page replacement}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{needreplace.eps}
+    \caption{Need for page replacement.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{pagereplace.eps}
+    \caption{A page replacement happening.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Need to select a victim frame.
+    \item Different page-replacement algorithms for this.
+    \item Some pages are more expensive to replace.
+    \item If they're not changed we can use the copy on disk already.
+    \item If they're changed we need to write the new version to disk again.
+  \end{itemize}
+\end{frame}
+
+\subsection{Page-replacement algorithms}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item We can use a page-reference string to test an algorithm through 
+      a simulator.
+
+    \item For (some of) these different algorithms there is a simulator, this 
+      one is included with the lab.
+
+    \item You have a C version and a Python version.
+
+    \item cpager: \term{cd cpager \&\& make pager \&\& ./pager}
+
+    \item pypager: \term{cd pypager \&\& ./pypager}
+
+  \end{itemize}
+\end{frame}
+
+\subsection{FIFO page replacement}
+
+\begin{frame}{\insertsubsectionhead}
+\end{frame}
+
+\subsection{Optimal page replacement}
+
+\begin{frame}{\insertsubsectionhead}
+\end{frame}
+
+\subsection{LRU page replacement}
+
+\begin{frame}{\insertsubsectionhead}
+\end{frame}
+
+\subsection{LRU-approximation page replacement}
+
+\begin{frame}{\insertsubsectionhead}{Additional reference bits}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}{Second-Change algorithm}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}{Enhanced Second-Change algorithm}
+\end{frame}
+
+
+\section{Frame Allocation}
+
+\subsection{Allocation between processes}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item How many frames should each process be given?
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[allowframebreaks]{Referenser}
+  \small
+  \printbibliography
+\end{frame}
+
+\end{document}
+

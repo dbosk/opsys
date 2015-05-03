@@ -1,0 +1,26 @@
+page 1 generated page fault
+allocated free frame 0 to page 1
+swapped in page 1
+page 1 mapped to frame 0
+page 2 generated page fault
+allocated free frame 1 to page 2
+swapped in page 2
+page 2 mapped to frame 1
+page 3 generated page fault
+allocated free frame 2 to page 3
+swapped in page 3
+page 3 mapped to frame 2
+page 4 generated page fault
+allocated free frame 3 to page 4
+swapped in page 4
+page 4 mapped to frame 3
+page 5 generated page fault
+allocated free frame 4 to page 5
+swapped in page 5
+page 5 mapped to frame 4
+page 6 generated page fault
+swapped out page 1
+swapped in page 6
+page 6 mapped to frame 0
+page 2 mapped to frame 1
+page 10 generated abort trap: process killed

@@ -1,0 +1,313 @@
+% $Id$
+% Author:	Daniel Bosk <daniel.bosk@miun.se>
+\documentclass[addpoints]{miunexam}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[swedish,english]{babel}
+\usepackage{hyperref,url}
+\usepackage{color}
+\usepackage{prettyref,varioref}
+\usepackage{subfigure}
+\usepackage{listings}
+\usepackage[binary]{SIunits}
+\usepackage[varioref,prettyref,listings]{miunmisc}
+\bibliographystyle{alpha}
+
+%\printanswers
+
+\examtype{Final exam}
+\courseid{DT011G}
+\course{Introduction to Operating Systems}
+\date{2013-01-18}
+
+\author{%
+	Daniel Bosk\\
+  {\small\texttt{\href{mailto:daniel.bosk@miun.se}{daniel.bosk@miun.se}}}\\
+  {\small\textit{Phone:} 060\,-\,14\,8709}\\
+}
+
+\begin{document}
+\maketitle
+\thispagestyle{foot}
+
+\section*{Instructions}
+\label{sec:Instructions}
+\noindent
+Carefully read the questions before you start answering them.
+Note the time limit of the exam and plan your answers accordingly.
+Only answer the question, do not write about subjects remotely related to the
+question.
+
+Write your answers on separate sheets, not on the exam paper.
+Only write on one side of the sheets.
+Start each question on a new sheet.
+
+Make sure you write your answers clearly, if I cannot read an answer the answer
+will be awarded no points -- even if the answer is correct.
+The questions are \emph{not} sorted by difficulty.
+
+\begin{description}
+	\item[Time] 6 hours.
+  \item[Aids] Dictionary, course literature \cite{Silberschatz2009osc}, graded 
+    assignments and personal notes.
+	\item[Maximum points] \numpoints
+	\item[Questions] \numquestions
+\end{description}
+
+%\subsection*{Bonus points}
+%\noindent
+%You must get an E or higher, to get the bonus points added to your final grade.
+%Bonus points will be added to this exam and the first re-exam.
+
+\subsection*{Preliminary grades}
+\noindent
+The following grading criteria applies:
+E \(\geq 50\%\),
+D \(\geq 60\%\),
+C \(\geq 70\%\), 
+B \(\geq 80\%\),
+A \(\geq 90\%\);
+with no question awarded zero points.
+
+
+\section*{Aim}
+\label{sec:Aim}
+\noindent
+The aim of the exam is to examine that you have fulfilled the requirements 
+specified in the course syllabus.
+
+\clearpage
+\section*{An operating systems oriented computer science fiction,\\
+  or: The exam questions}
+\noindent
+
+\begin{questions}
+  \question[4]\label{q:threads}
+  At your work there is this guy Bill, he always comes to you for help.
+  He is a nice guy, he always means well.
+  But sometimes things just does not turn out as intended, alright, most of the 
+  times.
+  This time, however, he comes with a minor problem, it is not a problem 
+  really, more of a thought.
+
+  ``Sorry to bother you again'', he says, ``I was looking around for ideas on 
+  how to improve the built-in web browser in my system'', Bill maintains an 
+  operating system in his spare time, ``and I was looking at Firefox and 
+  Chromium.
+  As I understand it, Firefox runs each tab as a new thread whereas Chromium 
+  spawns a new process for each tab.
+  Which approach do you think would be the most advantageous?''
+
+  Help Bill by explaining the advantages and disadvantages of each approach.
+  \begin{solution}
+    % XXX rewrite solution for question on threads
+    Threads share memory of a single process \cite[p.  
+    153--154]{Silberschatz2009osc}, hence less memory is used to handle many 
+    clients.
+    This could be the difference between having to swap to disk or not.
+    It will definitely be faster to create a thread for each client than to 
+    fork an entire process \cite[p. 154]{Silberschatz2009osc} (although the 
+    forking in UNIX-like systems is heavily optimized for this).
+
+    The disadvantages include more complex programming (concurrent programming 
+    is thus more error prone) which increases the risk of buggy code, which of 
+    course can be exploited.
+    Another disadvantage is that if a client manages to crash its server, i.e.\ 
+    a thread, then the entire web-server goes down -- for all clients!
+    E.g.\ generating a memory error in one thread will make the operating 
+    system terminate the process, not just a single thread.
+
+    Furthermore, since memory is shared among threads, this means that the 
+    thread of one client can access the memory of a thread of another client.
+    Thus a client could access the web data of another client, containing e.g.\ 
+    credit-card data.
+    This is of course provided there exists a vulnerability which can be 
+    exploited, but as stated above: multi-threaded programs are more complex 
+    and hence more error prone.
+  \end{solution}
+
+  \question[5]\label{q:deadlock}
+  By the end of the day your telephone rings, it is your not-so-tech-savy 
+  friend.
+  He is by the way a rather enthusiastic fellow, some would even go for the 
+  word excentric.
+  His name is Steve, and you are going out with Steve and Bill to catch the 
+  latest film in the theatre right after work.
+
+  ``How're you doing'', he says, ``are you and Bill on your way?''
+
+  ``Yes, we'll leave in a few minutes'', you say.
+
+  ``Great!  You know I was thinking about what you said about deadlocks a few 
+  months ago.  I'll tell you when you get here.''
+
+  You and Bill leave the office and arrive at the theatre to meet Steve by the 
+  registers to get your tickets.
+
+  ``About that deadlock-thingy, I was thinking about getting these tickets.
+  You know, the cashier does not trust us to give us the tickets before we pay.
+  Hence, we have to trust the cashier by paying and then hoping we get the 
+  tickets.
+  If we would not trust the cashier, and thus would require the tickets before 
+  we pay, \emph{then} we would encounter a deadlock, isn't that right?''
+
+  It would appear Steve actually learned what a deadlock is.
+  But just to be sure he is not just lucky, talk him through why this is 
+  a deadlock.
+  \begin{solution}
+    % XXX rewrite solution for deadlock question
+    The problem here is not that of a deadlock, it is a common misuse of 
+    terminology.
+    For a deadlock to occur you need the following four conditions to hold 
+    \cite[pp. 285--287]{Silberschatz2009osc}:
+    \begin{enumerate}
+      \item Mutual exclusion: at least one resource must be held by any process 
+        in an unsharable way, such that no other process can access the 
+        resource while being held by another process.
+      \item Hold and wait: a process must be holding at least one resource and 
+        must be waiting for at least one more which is held by another process.
+      \item No preemption: there can be no preemption, i.e. there cannot be any 
+        process which may interrupt and force another process to release any 
+        resource.
+        Hence we cannot deallocate a resource from one process to reallocate it 
+        to another.
+        Thus no kind of priority system may exist.
+      \item Circular wait: there must exist a set of processes \(\{P_1, \ldots, 
+        P_n\}\) such that \(P_1\) is waiting for \(P_2\), which is waiting for 
+        \(P_3\), and so on until \(P_n\) which is waiting for \(P_1\).
+    \end{enumerate}
+    If these four conditions hold we have a deadlock.
+
+    Then why is our scenario above not a deadlock?
+    First, there is no resource for which we have mutual exclusion.
+
+    Second, there is no process holding a resource and waiting for another held 
+    by a different process.
+    We have one process waiting for another process, the \term{tar(1)} process 
+    on the server waiting for data from that on the client, but not in a way 
+    required by our condition.
+
+    Third, as there is no resource for which we have mutual exclusion there is 
+    no sense in speaking of preemption for any such resource either.
+
+    Fourth, there is no circular wait involved.
+    Sure, as stated above the server process waits for data from the client 
+    process, but there is no resource which is being held which is waited for.
+
+    It is thus inappropriate use of terminology to call this a deadlock.
+    Using an analogy of Sten-Erik Winborg: if you consider the Dining 
+    Philosophers Problem, what happened in our scenario is equivalent of 
+    removing the bowl in the middle of the table from which the philosophers 
+    get their food.
+  \end{solution}
+
+  \question\label{q:drivers}
+  After the film has ended you pose the question about threads and processes to 
+  Steve.
+
+  ``Steve, Bill is thinking about whether to choose threads or processes in his 
+  browser, what are your thoughts?''
+
+  ``Certainly he should choose the one easiest for developers.
+  Getting developers to your platform is the key to success'', Steve replies.
+
+  ``Sure, but shouldn't I think first about my users'', Bill asks.
+
+  ``Developers, developers, developers'', Steve starts to chant like obsessed, 
+  shortly continuing to shouting, ``DEVELOPERS, DEVELOPERS, DEVELOPERS!
+  I love that word; some day, if I am to hold a presentation I will start it 
+  with those very words.''
+
+  ``We know that for sure, and so does the rest of the theatre.
+  I solved the networking stuff by copying the the code from Berkeley, but I do 
+  not know how to solve the interface to the hardware.
+  I have heard of monolithic kernels, loadable kernel modules and drivers; I do 
+  not really know what that means though.''
+
+  You on the other hand, know perfectly well the different approaches to 
+  interface the hardware.
+  Explain to Bill
+  \begin{parts}
+    \part[2] the different types of kernels there are, and
+    \part[4] what advantages there are of each type.
+  \end{parts}
+  \begin{solution}
+    % XXX write solution to driver question
+    \dots
+  \end{solution}
+
+  \question\label{q:fs}
+  You are at work again.
+  Bill is busy working, in the evenings he is implementing the things you have 
+  talked about earlier; this is very nice as this allows you to actually get 
+  some work done.
+  However, you are very good at distracting yourself on your own as well.
+  You hear a colleague of yours moaning aloud about how ``it is time to defrag 
+  again''.
+
+  Explain to your colleague
+  \begin{parts}
+    \part[2] what defragmentation is and why it is necessary on some file 
+    systems,
+    \part[2] tell him about some of the file systems which does not require 
+    defragmentation (this includes why they do not need this).
+  \end{parts}
+  \begin{solution}
+    % XXX write solution for fs question
+    \dots
+  \end{solution}
+
+  \question[6]\label{q:scheduling}
+  You are back in your office, it is Friday afternoon.
+  Another one of your co-workers comes by.
+  He says to you ``I hope you haven't forgotten about our meeting.
+  You promised me you'd give me some feedback on my ideas for Freax'', and he 
+  smiles.
+  He knows just as well as you do that you did forget about it, it was not in 
+  your calendar and you have been so distracted this week you remember only 
+  fragments.
+
+  ``Well,'' he continues, ``we are supposed to discuss some aspects of 
+  scheduling for my free-time project.''
+  His name is Linus and he is an intern from the University of Helsinki.
+  ``What I'd like to do is to have a nice general scheduling algorithm for 
+  processes.
+  Interactive processes should have priority over I/O-bound processes''.
+  The two of you enter the meeting room.
+
+  Give Linus an overview of how to implement his scheduler.
+  (A tip is to look at how the Linux operating system actually does its process 
+  scheduling; yes, there is a little ``Back to the future'' about this tip.)
+  \begin{solution}
+    % XXX write a solution to scheduling question
+    The thing which comes to mind is a DFS with location independence.
+    This means a system where the physical location of a file can change from 
+    one place to another without any visible change in its logical location 
+    \cite[p. 707]{Silberschatz2009osc}.
+    One system which implements this is AFS.
+    To see why this helps our two hippie friends we have to overview the 
+    implementation.
+
+    In AFS terminology there are client machines and server machines.
+    The servers all present the clients with a homogeneous, identical, and 
+    location-transparent file hierarchy -- the shared name space \cite[p.  
+    719]{Silberschatz2009osc}.
+
+    More than this AFS features client-side caching with cache consistency 
+    \cite[p. 718]{Silberschats2009osc} which means that the client can cache 
+    files used often and that these cached versions are guaranteed to be 
+    consistent across the system.
+    It also includes server-side caching in the form of replicas, with high 
+    availability through automatic switchover to a replica if the source server 
+    is temporaily unavailable \cite[p. 718]{Silberschatz2009osc}.
+    (It also provides authentication using Kerberos.)
+  \end{solution}
+\end{questions}
+
+Finally Friday evening, now it is time for a treat after all this hard work.
+\begin{center}
+  \textbf{The end.}
+\end{center}
+
+\bibliography{literature}
+\end{document}

@@ -1,0 +1,285 @@
+% $Id$
+% Author:	Daniel Bosk <daniel.bosk@miun.se>
+\documentclass[addpoints]{miunexam}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[swedish,english]{babel}
+\usepackage{hyperref,url}
+\usepackage{color}
+\usepackage{prettyref,varioref}
+\usepackage{subfigure}
+\usepackage{listings}
+\usepackage[binary]{SIunits}
+\usepackage[varioref,prettyref,listings]{miunmisc}
+\bibliographystyle{alpha}
+
+%\printanswers
+
+\examtype{Final exam}
+\courseid{DT011G}
+\course{Introduction to Operating Systems}
+\date{2014-01-13}
+
+\author{%
+	Daniel Bosk\\
+  {\small\texttt{\href{mailto:daniel.bosk@miun.se}{daniel.bosk@miun.se}}}\\
+  {\small\textit{Phone:} 060\,-\,14\,8709}\\
+}
+
+\begin{document}
+\maketitle
+\thispagestyle{foot}
+
+\section*{Instructions}
+\label{sec:Instructions}
+\noindent
+Carefully read the questions before you start answering them.
+Note the time limit of the exam and plan your answers accordingly.
+Only answer the question, do not write about subjects remotely related to the
+question.
+
+Write your answers on separate sheets, not on the exam paper.
+Only write on one side of the sheets.
+Start each question on a new sheet.
+
+Make sure you write your answers clearly, if I cannot read an answer the answer
+will be awarded no points -- even if the answer is correct.
+The questions are \emph{not} sorted by difficulty.
+
+Note that your answers for this exam does \emph{not} have to include references 
+to relevant literature.
+
+\begin{description}
+	\item[Time] 5 hours.
+  \item[Aids] Dictionary,
+    course literature 
+    \cite{Silberschatz2009osc,Silberschatz2013osc,Silberschatz2013intl},
+    graded assignments,
+    personal notes,
+    and a calculator.
+    The student may use the following e-book reader:
+    TrekStor eBook-reader 3.0.
+	\item[Maximum points] \numpoints
+	\item[Questions] \numquestions
+\end{description}
+
+%\subsection*{Bonus points}
+%\noindent
+%You must get an E or higher, to get the bonus points added to your final grade.
+%Bonus points will be added to this exam and the first re-exam.
+
+\subsection*{Preliminary grades}
+\noindent
+The following grading criteria applies:
+E \(\geq 50\%\),
+D \(\geq 60\%\),
+C \(\geq 70\%\), 
+B \(\geq 80\%\),
+A \(\geq 90\%\);
+with no question awarded zero points.
+
+
+\section*{Aim}
+\label{sec:Aim}
+\noindent
+The aim of the exam is to examine that you have fulfilled the requirements 
+specified in the course syllabus.
+
+\clearpage
+\section*{An operating system saga,\\
+  or: The exam questions}
+\noindent
+
+\begin{questions}
+  \question
+  It's an early Monday morning, you've just arrived to your office.
+  You're thinking to yourself ``Oh, this is too early for me, I shouldn't get 
+  out of bed before noon.''
+  Considering this you decide to go to the fika room to see if any of your 
+  colleagues feel the same way, and in which case you can feel sorry for each 
+  other.
+  One of your colleagues is there, sitting in the sofa with a copy of 
+  Silberschatz's \emph{Operating System Concepts} in his lap.
+  He looks up at you and says ``You're knowledgable in this, I don't understand 
+  this kernel and user mode.
+  What's the point of those anyway?''
+
+  Give a short description of
+  \begin{parts}
+    \part[3] why we need to make the distinction of kernel and user mode, and
+    \begin{solution}
+      We need to make this distinction because otherwise a simple application 
+      program could take over the roll of the operating system (OS), e.g.\ it 
+      could simply skip giving control back to the OS.
+      So the OS needs kernel and user mode to be able to enforce its rules on 
+      the application programs.
+      (See \cite[pp.\ 21-22]{Silberschatz2009osc} for details.)
+    \end{solution}
+
+    \part[3] the requirements to implement the two modes.
+    \begin{solution}
+      The OS runs in kernel mode, it sets a timer (hardware) to generate an 
+      interrupt in 50 milliseconds, then it changes to user mode and starts the 
+      execution of application code.
+      After 50 milliseconds the timer generates an interrupt, this sets the 
+      mode back to kernel mode and executes the OS's interrupt handler.
+      The control is now back with the OS.
+      For this to work it must be a privileged instruction to set the timer, we 
+      need a hardware timer to generate an interrupt.
+
+      We also need support from hardware for the two modes, a mode bit must 
+      exist in hardware so that the processor knows what kind of code it 
+      executes, and in the case of executing a privileged instruction in user 
+      mode it will generate a trap.
+    \end{solution}
+  \end{parts}
+
+
+  \question
+  Feeling much better after a soft start of the day you return to your desk.
+  You start thinking about the CPU scheduler in the OS of your laptop computer.
+  The scheduler is very good most of the times, but sometimes things feel like 
+  their very slow.
+
+  Your train of thought goes down a tricky path.
+  \begin{parts}
+    \part[3] Explain why not all OSes use the optimal scheduling algorithm 
+    shortest-job-first (SJF)?
+    \begin{solution}
+      SJF is optimal in that it gives the lowest possible average waiting time.
+      However, this requires it to know all future jobs and their CPU-burst 
+      lengths, something which is impossible.
+      We can at best estimate this.
+
+      Due to its design, SJF also gives rise to the possibility of starvation.
+      Some processes might never execute because processes with shorter 
+      CPU-bursts are run before.
+
+      Also, some OSes optimize the scheduler for other things than minimizing 
+      the average waiting time.
+    \end{solution}
+
+    \part[3] Also explain what is a good scheduling strategy for an ordinary 
+    laptop computer system.
+    \begin{solution}
+      An ordinary laptop will run mostly interactive programs, hence we want it 
+      to be responsive.
+      To achive this we can use many ready-queues instead of only one, and 
+      processes can move between queues depending on their execution behaviour.
+      This method is called multi-level feedback queue.
+
+      This way, we can favour I/O-intensive processes, since these will use the 
+      CPU a shorter time before relinquishing the CPU due to I/O.
+      Then CPU-intensive processes can use the CPU when all I/O-bound processes 
+      are waiting for I/O.
+      This way we will get a responsive system since it's the I/O-bound 
+      processes which will be interactive ones.
+    \end{solution}
+  \end{parts}
+
+
+  \question
+  Interrupted from your thoughts on scheduling, your colleague from the morning 
+  is back again -- still with Silberschatz in hand.
+
+  ``We add paging to primary memory to remove problems of (external) 
+  fragmentation,'' she says.
+  ``In the same manner we divide the secondary memory into blocks (and 
+  clusters).
+  Then why do we talk about fragmentation in file systems when it's not an 
+  issue in RAM?''
+
+  You're thinking to yourself, ``well, that's not true of all file systems, but 
+  fine, we're not on that level yet.''
+
+  \begin{parts}
+    \part[3] Explain what is meant by ``fragmentation'' when we talk about 
+    files in secondary memory.
+    \begin{solution}
+      What we mean by fragmentation is that data is fragmented.
+      We have two types of fragmentation, external and internal fragmentation.
+      External being an issue due to contiguous allocation, because then free 
+      space might be fragmented so that there is enough free space -- but it's 
+      not contiguous and thus cannot be used.
+
+      Internal fragmentation arises when we try to counter external 
+      fragmentation.
+      We counter external fragmentation by dividing the space into blocks of 
+      a fixed size.
+      This way, whenever we need some space we allocate a sufficient amount of 
+      blocks.
+      In some cases we need less space than a full block, hence some space (the 
+      leftovers inside the block) is wasted.
+      But this way we can use all unallocated blocks as long as there are 
+      enough blocks free to cover our need.
+
+      This solution is applied both to primary and secondary storage.
+      In primary memory we have paging to map a contiguous logical memory to 
+      a non-contiguous physical memory.
+      For secondary storage, this means a contiguous file (logical space) is 
+      not stored contiguously in the storage medium (physical space).
+      Hence, what we mean by ``fragmentation'' in this case is that the blocks 
+      of the file are not stored contiguously but spread across the disk.
+    \end{solution}
+
+    \part[3] Explain why this can be an issue in secondary memory but not in 
+    primary despite us using the same methods in both places.
+    \begin{solution}
+      The reason this ``fragmentation'' is an issue in secondary storage and 
+      not in primary storage is due to the type of storage medium.
+      In primary storage, physical memory, we can access all parts of the 
+      physical memory module equally fast.
+      In secondary storage, a magnetic disk, we cannot do this.
+      This is due to the fact that a magnetic disk rotates and has a reading 
+      arm which has to be moved into position and then wait for the disk to 
+      rotate to the correct position.
+      Thus, the time it takes to read from this disk depends on how we read the 
+      data.
+      If the blocks of a file are stored in consecutive order on the disk we 
+      can read them all together, if not, then we have to move the read head 
+      and wait for rotation.
+
+      As such, this is no longer an issue in secondary storage with solid state 
+      disks, this is because these work more like the physical memory modules 
+      of primary storage.
+    \end{solution}
+  \end{parts}
+
+
+  \question[3]
+  You are finally approaching the end of your day.
+  Thinking back on a day full of interruptions, you start thinking ``oh, how 
+  I wish I could just turn off preemption sometimes.''
+  That reminds you that OSes sometimes turns off interrupts in kernel mode to 
+  avoid race conditions, ``why couldn't Mother Nature make the world more like 
+  an x86-architecture?''
+
+  That the kernel must protect its data structures by locks in a multiprocessor 
+  environment is obvious, but why must the kernel do that in a single processor 
+  environment too?
+  \begin{solution}
+    The problem we address in this question is about locks in the kernel -- not 
+    processes.
+    The kernel is one running program, in this case running only on a single 
+    processor (single core).
+    The reason we need to use locking mechanisms to protect sensitive kernel 
+    data structures is due to interrupts.
+    Although the kernel executes only in one thread it can be interrupted at 
+    any time, and the interrupt handler also executes as kernel code.
+    This way the kernel might execute in two critical sections simultaneously.
+
+    One solution is to introduce locks, another is to turn off interrupts in 
+    the entry section of a critical section and then turn it on again in the 
+    exit section.
+  \end{solution}
+
+
+\end{questions}
+
+Finally, now it is time for a treat after all this hard work.
+\begin{center}
+  \textbf{The end.}
+\end{center}
+
+\bibliography{literature}
+\end{document}

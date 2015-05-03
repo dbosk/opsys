@@ -1,0 +1,421 @@
+% $Id$
+% Author:	Daniel Bosk <daniel.bosk@miun.se>
+%\documentclass[handout]{beamer}
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english,swedish]{babel}
+\usepackage{url}
+\usepackage{varioref,prettyref}
+\usepackage{graphicx}
+\usepackage[today,nofancy]{svninfo}
+\usepackage[natbib,style=alphabetic,maxbibnames=99,backend=bibtex8]{biblatex}
+\addbibresource{literature.bib}
+\usepackage[varioref,prettyref]{miunmisc}
+
+\svnInfo $Id$
+
+\mode<presentation>
+{
+  \usetheme{Frankfurt}
+  \setbeamercovered{transparent}
+  \usecolortheme{seagull}
+}
+%\def\newblock{\hskip .11em plus .33em minus .07em}
+\setbeamertemplate{footline}{\insertframenumber}
+
+\title{%
+  Physical Memory
+}
+\author{Daniel Bosk\footnote{%
+	\tiny
+  This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 
+  Unported license.
+	To view a copy of this license, visit 
+	\url{http://creativecommons.org/licenses/by-sa/3.0/}.
+}}
+\institute[MIUN ICS]{%
+  Department of Information and Communication Systems (ICS),\\
+  Mid Sweden University, Sundsvall.
+}
+\date{\svnId}
+
+
+\AtBeginSection[]{%
+  \begin{frame}<beamer>{Overview}
+		\tableofcontents[currentsection]
+	\end{frame}
+}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Overview}
+	\tableofcontents
+	% You might wish to add the option [pausesections]
+\end{frame}
+
+\begin{frame}{Literature}
+  \input{literature.tex}
+\end{frame}
+
+
+% Since this a solution template for a generic talk, very little can
+% be said about how it should be structured. However, the talk length
+% of between 15min and 45min and the theme suggest that you stick to
+% the following rules:  
+
+% - Exactly two or three sections (other than the summary).
+% - At *most* three subsections per section.
+% - Talk about 30s to 2min per frame. So there should be between about
+%   15 and 30 frames, all told.
+
+
+\section{Hardware}
+
+\subsection{Basic hardware}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{membaselimit.pdf}
+    \caption{Memory layout with base and limit for logical address space.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{hwbaselimit.pdf}
+    \caption{A schematic of hardware protection for base and limit memory 
+      protection.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+
+\section{Address Binding}
+
+\subsection{Binding memory in a process}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{loadlink.pdf}
+    \caption{An overview of all steps to create a program.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\subsection{Relocation registers}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{relocation.pdf}
+    \caption{An illustration of a relocation register.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{safereloc.pdf}
+    \caption{A relocation register with base and limit properties.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+
+\section{Memory Allocation}
+
+\subsection{Contiguous Allocation}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item First-fit
+    \item Best-fit
+    \item Worst-fit
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item 50-percent rule
+  \end{itemize}
+\end{frame}
+
+\subsection{Non-Contiguous Allocation}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Paging
+    \item Segmentation
+  \end{itemize}
+\end{frame}
+
+\subsection{Paging}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Split the logical address into two parts:
+      \begin{itemize}
+        \item page number, and
+        \item page offset (displacement).
+      \end{itemize}
+
+    \item Fix the size of the pages in bits of the address, i.e.\ the size is 
+      a power of two.
+      E.g.\ page size is the last 10 bits, then each page will be \(2^{10}\) 
+      bytes or 1 KB in size.
+
+    \item The size of the page must be equal to the size of the physical 
+      counterpart, the frame.
+      Hence the page size is determined by the hardware.
+
+    \item Each page is mapped to a frame, this mapping is kept in a page table.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{pagemap.pdf}
+    \caption{An overview of paging.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{pagetable.pdf}
+    \caption{A pagetable.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{pagealloc.pdf}
+    \caption{Allocated memory using paging.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{pagenew.pdf}
+    \caption{Before and after allocating a new process to memory.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item The page table is usually stored by the OS in the process's PCB.
+
+    \item The dispatcher loads the process's page table into the hardware, if 
+      the page table is sufficiently small.
+      
+    \item Bigger tables must be kept in the memory, then a page table base 
+      register points to the page table's position in memory.
+
+    \item However, this requires a memory lookup, i.e.\ each memory reference 
+      requires two references!
+
+    \item The solution is to add a translation look-aside buffer (TLB), a very 
+      fast hardware cache.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{tlb.pdf}
+    \caption{Paging with a TLB.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Some TLBs has address-space identifications (ASIDs).
+
+    \item ASIDs allows the TLB to handle pages for different processes 
+      simultaneously.
+
+    \item Hence we don't need to clear it every context switch.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item One can compute the effective access time for memory access.
+
+    \item Effective access time is the average time it takes for each memory 
+      access, i.e.\ with regards to TLB misses and hits.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{block}{Effective access time}
+    We can compute the effective access time \(t\) by \[
+      t = (1-p)\times (t_t + t_m) + p\times (t_t + t_m + t_m),
+    \] where \(p\) is the probability of a TLB miss, \(t_t\) is the time for 
+    a TLB lookup, \(t_m\) is the time for a memory access.
+  \end{block}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item We must have some protection for the pages of a process.
+
+    \item What happens when the process's logical address space is smaller than 
+      the possible physical address space.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{pagevalid.pdf}
+    \caption{Paging with valid-bits.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item We can also add additional bits like this.
+
+    \item We can have bits for specifying whether reading, writing or execution 
+      is allowed on these pages.
+
+    \item This way we can implement execution prevention for certain memory 
+      regions, e.g.\ where the web-browser stores data downloaded from the Web.
+
+    \item This way several processes can share read-only pages, hence requiring 
+      less memory.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{sharedpage.pdf}
+    \caption{An example of shared pages.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item What happens when we get huge logical address spaces, e.g.\ 32 or 
+      64-bit addresses?
+
+    \item With a page size of 4 KB (i.e.\ 12 bits) the worst case scenario is 
+      a page table of 4 MB in size -- for each process!
+
+    \item If we need to allocate this contiguously in memory we're back to the 
+      original problem we wanted to solve.
+
+    \item Well, we have a solution for that: paging!
+
+    \item We page the page table ...
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{pagehierbig.pdf}
+    \caption{Hierarchical paging.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{pagehier.pdf}
+    \caption{Hierarchical paging, overview.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Now each part of the page table fits in a page.
+    \item Hence we don't need contiguous allocation anymore.
+    \item However, this doesn't work for spaces even as small as 64 bits.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{pagehash.pdf}
+    \caption{Paging using hashing.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Another way of saving space is to use an inverted page table.
+    \item Here we have one entry per frame, not per page.
+    \item Then we map which process has allocated it and to which page.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{pageidx.pdf}
+    \caption{Inverted paging.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\subsection{Segmentation}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{segments.pdf}
+    \caption{Segments.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{seghw.pdf}
+    \caption{Segmentation hardware.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{segmap.pdf}
+    \caption{Segment mapping.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+%\begin{frame}{\insertsubsectionhead}
+%  \begin{figure}
+%    \includegraphics[width=\textwidth]{pageseg.pdf}
+%    \caption{Segmentation and paging.
+%      Image: \cite{Silberschatz2013osc}.}
+%  \end{figure}
+%\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[allowframebreaks]{Referenser}
+  \small
+  \printbibliography
+\end{frame}
+
+\end{document}
+

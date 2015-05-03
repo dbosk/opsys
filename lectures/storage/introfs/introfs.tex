@@ -1,0 +1,431 @@
+% $Id$
+% Author:	Daniel Bosk <daniel.bosk@miun.se>
+%\documentclass[handout]{beamer}
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[swedish,english]{babel}
+\usepackage{url}
+\usepackage{varioref,prettyref}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage[today,nofancy]{svninfo}
+\usepackage[natbib,style=alphabetic,maxbibnames=99,backend=bibtex8]{biblatex}
+\addbibresource{literature.bib}
+\usepackage[listings,varioref,prettyref]{miunmisc}
+
+\svnInfo $Id$
+
+\mode<presentation>
+{
+  \usetheme{Frankfurt}
+  \setbeamercovered{transparent}
+  \usecolortheme{seagull}
+}
+%\def\newblock{\hskip .11em plus .33em minus .07em}
+\setbeamertemplate{footline}{\insertframenumber}
+
+\title{%
+  File Systems
+}
+\author{Daniel Bosk\footnote{%
+	\tiny
+  This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 
+  Unported license.
+	To view a copy of this license, visit 
+	\url{http://creativecommons.org/licenses/by-sa/3.0/}.
+}}
+\institute[MIUN ICS]{%
+  Department of Information and Communication Systems (ICS),\\
+  Mid Sweden University, Sundsvall.
+}
+\date{\svnId}
+
+
+\AtBeginSection[]{%
+  \begin{frame}<beamer>{Overview}
+    \begin{multicols}{2}
+      \tableofcontents[currentsection]
+    \end{multicols}
+	\end{frame}
+}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Overview}
+  \begin{multicols}{2}
+    \tableofcontents
+    % You might wish to add the option [pausesections]
+  \end{multicols}
+\end{frame}
+
+
+% Since this a solution template for a generic talk, very little can
+% be said about how it should be structured. However, the talk length
+% of between 15min and 45min and the theme suggest that you stick to
+% the following rules:  
+
+% - Exactly two or three sections (other than the summary).
+% - At *most* three subsections per section.
+% - Talk about 30s to 2min per frame. So there should be between about
+%   15 and 30 frames, all told.
+
+
+\section{File Concept}
+
+\subsection{File Meta-Data and Operations}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item A file is the smallest logical unit in the file system.
+
+    \item Its contents is defined by its creator, hence the data inside can 
+      have any structure.
+
+    \item From the perspective of the OS there is no difference between to 
+      files other than what can be seen in the meta-data.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}{Attributes}
+  \begin{description}
+    \item[Name] The symbolic file name for humans.
+
+    \item[Identifier] A unique number identifying the file within the file 
+      system (FS).
+
+    \item[Location] The file must be stored on some device.
+
+    \item[Size] The file has a size which depends on how much data is in it, 
+      and how much is needed for storage.
+
+    \item[Protection] Access control information must also be available.
+
+    \item[Time] Date and time, for audit recording and other useful things.
+
+  \end{description}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}{Operations}
+  \begin{description}
+    \item[Creating] One must be able to create a new file, i.e.\ allocate space 
+      and entry for the file.
+
+    \item[Writing] We need some support from the OS for writing to a file, 
+      a system call.
+
+    \item[Reading] We also need a system call for reading from a file.
+      This must keep track of where in the file we currently are, 
+      current-file-position pointer.
+
+    \item[Repositioning] We must be able to move within the file.
+
+    \item[Delete] And we must be able to remove the file if it's no longer 
+      needed.
+
+  \end{description}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item We need some other system calls and structures too.
+
+    \item The OS uses an open(2) and a close(2) system call.
+
+    \item OS keeps track of open files using the open-file table.
+      Can be seen using lsof(1).
+
+    \item The OS also has a per-process open-file table, this is where stdin 
+      and stdout resides.
+
+    \item Keeps a file pointer, file-open count, disk location of the file.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\insertsubsectionhead}
+  \begin{terminal}[basicstyle=\tiny\tt,numberstyle=\tiny]
+\$ lsof .
+COMMAND   PID   USER   FD   TYPE DEVICE SIZE/OFF    NODE NAME
+bash     6729 danbos  cwd    DIR    8,5     4096 8667228 .
+vim     13268 danbos  cwd    DIR    8,5     4096 8667228 .
+bash    32564 danbos  cwd    DIR    8,5     4096 8667228 .
+lsof    32565 danbos  cwd    DIR    8,5     4096 8667228 .
+lsof    32566 danbos  cwd    DIR    8,5     4096 8667228 .
+\$
+  \end{terminal}
+\end{frame}
+
+\subsection{Locks on Files}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item What happens if two processes want to open the same file?
+
+    \item We have shared and exclusive locks.
+
+    \item OS also provides either mandatory or advisory file-locking 
+      mechanisms.
+
+    \item Windows has mandatory, UNIX has advisory.
+
+  \end{itemize}
+\end{frame}
+
+\subsection{File Types and Internal Structure}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item The file name is for the user.
+      It can have an extension as a hint to the user and OS about its type.
+
+    \item To see what type a file really is, try file(1).
+
+    \item MacOS X keeps track of which program created the file, to use that 
+      for later opening again.
+
+    \item Windows is entirely extension based.
+
+    \item UNIX-like systems depends.
+      It can use a magic number inside, a hint from the extension, or the 
+      file(1) utility.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item From the operating system point of view, a file is simply a stream of 
+      bytes.
+
+    \item The OS packs a certain number of logical records into a physical 
+      block on disk.
+      Usually a logical record is a byte.
+
+    \item Disk space is allocated in physical blocks on the device, usually 
+      somewhere between 512 to 4096 bytes.
+
+    \item If a file is less than the block size we have internal fragmentation.
+
+  \end{itemize}
+\end{frame}
+
+
+\section{Access Methods}
+
+\subsection{Sequential Access}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item What would you say was the biggest difference between the casette 
+      band and the CD?
+
+    \item The casette band is a good example of sequential access, the CD is 
+      more close to direct access.
+
+    \item You start reading from the beginning and can read forward or rewind.
+
+    \item This simple model of access also works on random-access devices.
+
+  \end{itemize}
+\end{frame}
+
+\subsection{Direct Access}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item In the direct-access model the file is made up of fixed-length 
+      logical records.
+
+    \item These records can be accessed in no particular order.
+
+    \item The system doesn't need to search for the record by winding, it can 
+      just compute the location and go there directly.
+
+  \end{itemize}
+\end{frame}
+
+
+\section{Directory and Disk structure}
+
+\subsection{Partitions and Volumes}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item A storage device can be partitioned into several partitions.
+    \item Then one can fit several file systems in one device.
+    \item One can even leave space for swap space or raw disk.
+    \item Partitions can also be called slices or minidisks.
+    \item A file system can be created in any of these parts.
+    \item A partition containing a file system is called a volume.
+    \item The volume may be part of a disk, a whole disk or several disks in 
+      a RAID formation.
+    \item Each volume has a device directory or volume table of contents to 
+      keep track of all files.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item There are many types of file systems!
+    \item Memory-based file sytems, various types of virtual file systems.
+  \end{itemize}
+\end{frame}
+
+\subsection{Directory Overview}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item The directory can be seen as a symbol table translating names into 
+      directory entries.
+
+    \item In a directory we can search for files, create and delete files, 
+      rename a file, traverse to subdirectories or parent directories.
+
+  \end{itemize}
+\end{frame}
+
+\subsection{Single-Level and Two-Level Directory}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{onelvldir.pdf}
+    \caption{A one-level directory structure.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[width=\textwidth]{twolvldir.pdf}
+    \caption{A two-level directory structure.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\subsection{Tree-Structured Directories}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{treedir.pdf}
+    \caption{A tree-structured file system.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\subsection{Graph Directories}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{acyclicdir.pdf}
+    \caption{An acyclic graph directory structure.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{graphdir.pdf}
+    \caption{A general graph directory structure.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Directories can share subdirectories.
+    \item Can be implemented using links.
+  \end{itemize}
+\end{frame}
+
+
+\section{File System Mounting}
+
+\subsection{Mount Points}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item FS must be mounted, just as a file must be opened.
+
+    \item An FS can be mounted in any directory using a special directory entry 
+      pointing to the root directory of the mounted file system.
+
+    \item Windows uses an extended two-level directory structure with devices 
+      and volumes assigned drive letters.
+      Then volumes have a general graph directory structure.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{unmounted.pdf}
+    \caption{Two file systems, one is unmounted.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{mounted.pdf}
+    \caption{The previously unmounted file system is now mounted.
+      Note that the subdirectories are invisible when the directory is used as 
+      a mount point.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item In UNIX-like systems the command mount(8) is used to work with 
+      mounting volumes.
+
+    \item Without arguments mount(8) will show information on all currently 
+      mounted volumes in the system.
+
+  \end{itemize}
+\end{frame}
+
+\subsection{Remote File Systems}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item These FSs are mounted as other FSs, although they need some special 
+      care in the kernel.
+  \end{itemize}
+\end{frame}
+
+
+\section{Protection}
+
+\subsection{Access Control}
+
+\begin{frame}[fragile]{\insertsubsectionhead}
+  \begin{terminal}[basicstyle=\tiny\tt,numberstyle=\tiny]
+\$ ls -lha
+total 60K
+drwxr-x--- 2 danbos danbos 4.0K Dec  3 13:16 .
+drwxr-x--- 6 danbos danbos 4.0K Dec  3 10:07 ..
+-rw-r----- 1 danbos danbos  11K Dec  3 13:16 fs.tex
+-rw-r----- 1 danbos danbos  28K Dec  3 13:16 .fs.tex.swp
+-rw-r----- 1 danbos danbos  100 Dec  3 10:12 literature.tex
+-rw-r----- 1 danbos danbos  551 Dec  3 10:10 Makefile
+\$
+  \end{terminal}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[allowframebreaks]{Referenser}
+  \small
+  \printbibliography
+\end{frame}
+
+\end{document}
+

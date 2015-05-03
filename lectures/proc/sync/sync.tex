@@ -1,0 +1,329 @@
+% $Id$
+% Author:	Daniel Bosk <daniel.bosk@miun.se>
+%\documentclass[handout]{beamer}
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[swedish,english]{babel}
+\usepackage{url}
+\usepackage{varioref,prettyref}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage[today,nofancy]{svninfo}
+\usepackage[natbib,style=alphabetic,maxbibnames=99,backend=bibtex8]{biblatex}
+\addbibresource{literature.bib}
+\usepackage[listings,varioref,prettyref]{miunmisc}
+
+\svnInfo $Id$
+
+\mode<presentation>
+{
+  \usetheme{Frankfurt}
+  \setbeamercovered{transparent}
+  \usecolortheme{seagull}
+}
+%\def\newblock{\hskip .11em plus .33em minus .07em}
+\setbeamertemplate{footline}{\insertframenumber}
+
+\title{%
+  Synchronisation
+}
+\author{Daniel Bosk\footnote{%
+	\tiny
+  This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 
+  Unported license.
+	To view a copy of this license, visit 
+	\url{http://creativecommons.org/licenses/by-sa/3.0/}.
+}}
+\institute[MIUN ICS]{%
+  Department of Information and Communication Systems (ICS),\\
+  Mid Sweden University, Sundsvall.
+}
+\date{\svnId}
+
+
+\AtBeginSection[]{%
+  \begin{frame}<beamer>{Overview}
+		\tableofcontents[currentsection]
+	\end{frame}
+}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Overview}
+	\tableofcontents
+	% You might wish to add the option [pausesections]
+\end{frame}
+
+\begin{frame}{Literature}
+  \input{literature.tex}
+\end{frame}
+
+
+% Since this a solution template for a generic talk, very little can
+% be said about how it should be structured. However, the talk length
+% of between 15min and 45min and the theme suggest that you stick to
+% the following rules:  
+
+% - Exactly two or three sections (other than the summary).
+% - At *most* three subsections per section.
+% - Talk about 30s to 2min per frame. So there should be between about
+%   15 and 30 frames, all told.
+
+\section{Synchronisation}
+
+\subsection{Where does the problem arise?}
+
+\begin{frame}[fragile]{\insertsubsectionhead}
+  \begin{source}[language=Python]
+i = 0
+while (True):
+  i = i + 1
+  \end{source}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item When we have a preemptive scheduler or multiprocessor system, 
+      multiple processes can try to use the same resource at the same time.
+
+    \item When the outcome of the execution depends on the order of execution 
+      of the processes we say we have a race condition.
+
+  \end{itemize}
+\end{frame}
+
+\subsection{The Critical-Section Problem}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item We can sort out the parts of the code of a program which are 
+      suceptible to race conditions, these parts are called the critical 
+      sections.
+
+    \item The code just before the critical section is called the entry 
+      section.
+
+    \item The code in the end of the critical section is the exit section.
+
+    \item The code after the critical section is the remainder section.
+
+    \item The Critical-Section Problem is about the design of a protocol for 
+      several processes to use for cooperation around their critical sections.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  To solve the Critcal-Section Problem an algorithm (protocol) must fulfull the 
+  following requirements:
+  \begin{enumerate}
+    \item Mutual exclusion.
+      If a process \(P_i\) is executing in its critical section, no other 
+      process may do so.
+    \item Progress.
+      If no process is executing in its critical section and some processes 
+      wish to enter their critical sections, then only those processes 
+      \emph{not} in their remainder sections can participate in the decision.
+    \item Bounded waiting.
+      There exits a bound for how long a process which has requested to enter 
+      its critical section may have to wait before allowed to enter.
+  \end{enumerate}
+\end{frame}
+
+\subsection{Tools to solve the problem}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item Peterson's solution.
+    \item Locks.
+    \item Semaphores.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\insertsubsectionhead}{Peterson's Solution}
+  \begin{source}[language=Python]
+while (True):
+  flag[i] = True
+  turn = j
+  while ( flag[j] and turn == j ):
+    pass
+
+  # critical section
+
+  flag[i] = False
+
+  # remainder section
+  \end{source}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{itemize}
+    \item On modern computer architectures we need special hardware 
+      instructions to help us, e.g.\ TestAndSet or AtomicSwap.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\insertsubsectionhead}{TestAndSet}
+  \begin{source}[language=Python]
+# lock = [False]
+while ( True ):
+  while ( TestAndSet( lock ) ):
+    pass
+
+  # critical section
+
+  lock = False
+
+  # remainder section
+  \end{source}
+\end{frame}
+
+\begin{frame}[fragile]{\insertsubsectionhead}{AtomicSwap}
+  \begin{source}[language=Python]
+# lock = [False]
+while ( True ):
+  key = [True]
+  while ( key[0] ):
+    AtomicSwap( lock, key ) )
+
+  # critical section
+
+  lock = False
+
+  # remainder section
+  \end{source}
+\end{frame}
+
+\begin{frame}[fragile,allowframebreaks]{\insertsubsectionhead}{Bounded waiting}
+  \begin{source}[language=Python]
+# lock = [False]
+while ( True ):
+  waiting[i] = True
+  key = True
+  while ( waiting[i] and key[0] ):
+    key = TestAndSet( lock ) )
+
+  waiting[i] = False
+
+  # critical section
+
+  j = ( i + 1 ) \% n
+  while ( ( j != i ) and not waiting[j] ):
+    j = ( j + 1 ) \% n
+
+  if ( j == i ):
+    lock = False
+  else:
+    waiting[j] = False
+
+  # remainder section
+  \end{source}
+\end{frame}
+
+\begin{frame}[fragile]{\insertsubsectionhead}{Semaphores}
+  \begin{itemize}
+    \item Use two operations \code{wait()} and \code{signal()}.
+
+    \item A binary valued semaphore is called a mutex lock, since it provides 
+      mutual exclusion.
+
+    \item We have also counting semaphores.
+
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{\insertsubsectionhead}{Semaphores}
+  \begin{source}[language=Python]
+def wait( S ):
+  while ( S <= 0 ):
+    pass
+  S -= 1
+  \end{source}
+  \begin{source}[language=Python]
+def signal( S ):
+  S += 1
+  \end{source}
+\end{frame}
+
+\begin{frame}[fragile]{\insertsubsectionhead}{Semaphores}
+  \begin{source}[language=Python]
+while ( True ):
+  wait( mutex )
+
+  # critical section
+
+  signal( mutex )
+
+  # remainder section
+  \end{source}
+\end{frame}
+
+
+
+\section{Deadlocks}
+
+\subsection{The requirements}
+
+\begin{frame}{\insertsubsectionhead}
+  For a deadlock to occur, the following requirements must be fulfilled:
+  \begin{enumerate}
+    \item Mutual exclusion.
+    \item Hold and wait.
+    \item No preemption.
+    \item Circular wait.
+  \end{enumerate}
+  The converse, to prevent deadlocking we must guarantee at least one of the 
+  above requirements is not fulfilled at any time.
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{deadtruck.pdf}
+    \caption{A deadlock.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{deadlock.pdf}
+    \caption{Another deadlock.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{nodeadlock.pdf}
+    \caption{A similar situation which is not a deadlock.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+\subsection{Dining Philosophers Problem}
+
+\begin{frame}{\insertsubsectionhead}
+  \begin{figure}
+    \includegraphics[height=0.7\textheight]{dining.pdf}
+    \caption{The setup of the Dining Philosophers Problem.
+      Image: \cite{Silberschatz2013osc}.}
+  \end{figure}
+\end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[allowframebreaks]{Referenser}
+  \small
+  \printbibliography
+\end{frame}
+
+\end{document}
+
