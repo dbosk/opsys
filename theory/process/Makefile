@@ -3,6 +3,9 @@
 
 FILES=		process.tex aims.tex literature.tex examination.tex literature.bib
 
+.PHONY: all
+all: process.pdf
+
 process.pdf: ${FILES} miunasgn miunmisc
 
 examination.tex: ../examination.tex

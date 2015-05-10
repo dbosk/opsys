@@ -41,6 +41,9 @@ FILES+= 	${LECTURES}
 USE_LATEXMK= 	yes
 USE_BIBLATEX= 	yes
 
+.PHONY: all
+all: studyguide.pdf
+
 studyguide.pdf: ${FILES} miunart miunmisc
 
 .PHONY: clean

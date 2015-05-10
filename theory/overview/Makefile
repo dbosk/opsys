@@ -3,6 +3,9 @@
 
 FILES=		overview.tex aims.tex literature.tex examination.tex literature.bib
 
+.PHONY: all
+all: overview.pdf
+
 overview.pdf: ${FILES} miunasgn miunmisc
 
 examination.tex: ../examination.tex

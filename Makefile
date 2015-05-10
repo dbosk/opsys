@@ -1,7 +1,7 @@
 SUBDIR= 	studyguide
 SUBDIR+=	theory
 SUBDIR+=	labs
-SUBDIR+= 	lectures
+#SUBDIR+= 	lectures
 SUBDIR+=	exam
 
 INCLUDE_MIUNTEX=miuntex

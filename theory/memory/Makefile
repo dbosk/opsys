@@ -3,6 +3,9 @@
 
 FILES=		memory.tex aims.tex literature.tex examination.tex literature.bib
 
+.PHONY: all
+all: memory.pdf
+
 memory.pdf: ${FILES} miunasgn miunmisc
 
 examination.tex: ../examination.tex

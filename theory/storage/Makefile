@@ -3,6 +3,9 @@
 
 FILES=		storage.tex aims.tex literature.tex examination.tex literature.bib
 
+.PHONY: all
+all: storage.pdf
+
 storage.pdf: ${FILES} miunasgn miunmisc
 
 examination.tex: ../examination.tex
