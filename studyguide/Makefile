@@ -87,7 +87,7 @@ lectfs-lit.tex: ../lectures/storage/fs/literature.tex
 stor-lit.tex: ../lectures/storage/stor/literature.tex
 io-lit.tex: ../lectures/storage/io/literature.tex
 distsys-lit.tex: ../lectures/distsys/literature.tex
-special-lit.tex: ../lectures/special/literature.tex
+#special-lit.tex: ../lectures/special/literature.tex
 systems-lit.tex: ../lectures/systems/literature.tex
 vm-lit.tex: ../lectures/vm/literature.tex
 
